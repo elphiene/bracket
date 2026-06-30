@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env*
+*.pem
+*.key
+CLAUDE.md
+.claude/
+PLAN.md
+dist/
