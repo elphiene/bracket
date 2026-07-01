@@ -1,0 +1,82 @@
+.bracket-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px clamp(10px, 3vw, 24px) 40px;
+  scroll-behavior: smooth;
+}
+
+/* ── Round section ────────────────────────────── */
+.round-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 0;
+  border-bottom: 1px solid #161d27;
+  opacity: 0.55;
+  transition: opacity 0.25s;
+}
+
+.round-section:last-child {
+  border-bottom: none;
+}
+
+.round-current {
+  opacity: 1;
+}
+
+.round-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.round-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #6b8099;
+  text-transform: uppercase;
+}
+
+.round-current .round-name {
+  font-size: 15px;
+  color: #e6edf3;
+}
+
+.round-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #fff;
+  background: #f85149;
+  padding: 2px 8px;
+  border-radius: 3px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Cards in a round ─────────────────────────── */
+.round-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.third-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.third-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #484f58;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 5px;
+}

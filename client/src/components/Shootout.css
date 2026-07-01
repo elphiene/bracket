@@ -1,0 +1,89 @@
+.shootout {
+  border-top: 1px solid #2d3d52;
+  padding: 5px 8px 6px;
+}
+
+.so-label {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #6b8099;
+  margin-bottom: 4px;
+}
+
+.so-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.so-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.so-pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.so-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.so-goal {
+  background: #2ea043;
+}
+
+.so-miss {
+  border: 1.5px solid #6e3a3a;
+  background: transparent;
+}
+
+.so-count {
+  font-size: 12px;
+  font-weight: 800;
+  color: #8b949e;
+  min-width: 12px;
+  text-align: right;
+}
+
+.so-win .so-count {
+  color: #fff;
+}
+
+/* Larger pips inside the focused (big) bracket card */
+.match-card.big .shootout .so-pip {
+  width: 9px;
+  height: 9px;
+}
+
+/* ── Large variant for the live-focus hero ────────── */
+.shootout.lg {
+  border-top: none;
+  padding: 12px 0 0;
+  max-width: 340px;
+  margin: 0 auto;
+}
+.shootout.lg .so-label {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.shootout.lg .so-pip {
+  width: 11px;
+  height: 11px;
+}
+.shootout.lg .so-count {
+  font-size: 16px;
+  color: #e6edf3;
+}

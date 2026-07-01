@@ -1,0 +1,178 @@
+.match-card {
+  background: #1e2a3a;
+  border-radius: 7px;
+  border-left: 4px solid var(--accent, #2d3d52);
+  width: clamp(150px, 44vw, 168px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ── Large variant (focused round) ────────────── */
+.match-card.big {
+  width: clamp(210px, 66vw, 232px);
+}
+.match-card.big.placeholder {
+  min-height: 96px;
+}
+.match-card.big .card-header {
+  padding: 7px 12px 3px;
+  min-height: 22px;
+}
+.match-card.big .status-live,
+.match-card.big .status-minute,
+.match-card.big .status-phase,
+.match-card.big .status-ft,
+.match-card.big .kickoff-date {
+  font-size: 11px;
+}
+.match-card.big .team-row {
+  padding: 7px 12px;
+}
+.match-card.big .flag {
+  width: 26px;
+  height: 19px;
+}
+.match-card.big .team-name {
+  font-size: 17px;
+}
+.match-card.big .score {
+  font-size: 22px;
+  min-width: 24px;
+}
+
+.match-card.live {
+  border-left-color: #f85149;
+  box-shadow: 0 0 0 1px rgba(248, 81, 73, 0.3);
+}
+
+.match-card.highlight {
+  border-left-color: #f85149;
+  box-shadow: 0 0 0 1px rgba(248, 81, 73, 0.4), 0 0 12px rgba(248, 81, 73, 0.15);
+}
+
+.match-card.placeholder {
+  border-left-color: #2d3d52;
+  color: #4a5a70;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+}
+
+/* ── Status strip ─────────────────────────────── */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 2px;
+  min-height: 18px;
+}
+
+.status-live {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: #f85149;
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 2px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.status-minute {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: #2ea043;
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 2px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.status-phase {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: #d29922;
+  color: #1a1207;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.status-ft {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #4a5a70;
+}
+
+.kickoff-date {
+  font-size: 9px;
+  color: #4a5a70;
+}
+
+/* ── Team rows ──────────────────────────────────── */
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+}
+
+.flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b8099;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.match-card.done .team-name,
+.match-card.live .team-name,
+.match-card.highlight .team-name {
+  color: #e6edf3;
+}
+
+/* ── Winner (finished matches) ─────────────────── */
+.team-row.winner .team-name {
+  font-weight: 800;
+  color: #fff;
+}
+
+.trophy {
+  font-size: 11px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.match-card.big .trophy {
+  font-size: 14px;
+}
+
+.score {
+  font-size: 16px;
+  font-weight: 800;
+  color: #e6edf3;
+  flex-shrink: 0;
+  min-width: 18px;
+  text-align: right;
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

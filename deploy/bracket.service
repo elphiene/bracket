@@ -1,15 +1,25 @@
 [Unit]
 Description=bracket - World Cup live bracket server
-After=network.target
+Documentation=https://github.com/elphiene/bracket
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
 User=el
 WorkingDirectory=/home/el/Documents/El-Projects/bracket/server
-ExecStart=/usr/bin/node src/server.js
-Restart=on-failure
+# Cherry's openresty reverse-proxies bracket.cherryslabs.com -> localhost:3001
 Environment=NODE_ENV=production
-Environment=PORT=FIXME
+Environment=PORT=3001
+Environment=ACTIVE_SPORT=wc2026
+# Optional override for a self-hosted / alternate upstream API:
+# Environment=UPSTREAM_URL=https://worldcup26.ir
+# Absolute node path (nvm-managed). Update if the node version is upgraded.
+ExecStart=/home/el/.nvm/versions/node/v24.12.0/bin/node src/server.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
