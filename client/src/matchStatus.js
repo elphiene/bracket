@@ -90,24 +90,26 @@ export function penaltyShootout(match) {
   }
 }
 
-// Returns { text, className } for the card-header badge, or null when there's
-// nothing to show (not started — the caller shows the kickoff date instead).
-export function matchBadge(match) {
-  if (!match) return null
-  if (isFinished(match)) return { text: 'FT', className: 'status-ft' }
+// Descriptor for the card status bar: { label, state }.
+//   state ∈ 'upcoming' | 'live' | 'ft'  — drives styling.
+//   label is null when upcoming (the caller shows the kickoff date/time),
+//   or when a shootout should be shown instead (the caller checks that first).
+export function matchStatus(match) {
+  if (!match) return { label: null, state: 'upcoming' }
+  if (isFinished(match)) return { label: 'Full time', state: 'ft' }
 
   const raw = te(match)
   const v = raw.toLowerCase()
-  if (v === '' || v === 'notstarted') return null
+  if (v === '' || v === 'notstarted') return { label: null, state: 'upcoming' }
 
-  if (v === 'ht') return { text: 'HT', className: 'status-phase' }
-  if (v === 'et') return { text: 'ET', className: 'status-phase' }
-  if (v === 'pen' || inPenalties(match)) return { text: 'PEN', className: 'status-phase' }
+  if (v === 'ht') return { label: 'Half time', state: 'live' }
+  if (v === 'et') return { label: 'Extra time', state: 'live' }
+  if (v === 'pen' || inPenalties(match)) return { label: 'Penalties', state: 'live' }
 
   // Numeric minute: "67", "45+2", "90+3"
-  if (/^\d+(\+\d+)?$/.test(raw)) return { text: `${raw}'`, className: 'status-minute' }
+  if (/^\d+(\+\d+)?$/.test(raw)) return { label: `${raw}'`, state: 'live' }
 
   // Literal "live" (the value the API actually sends) or any other
-  // non-terminal state: pulsing LIVE badge.
-  return { text: v === 'live' ? 'LIVE' : raw.toUpperCase(), className: 'status-live' }
+  // non-terminal state.
+  return { label: 'In progress', state: 'live' }
 }

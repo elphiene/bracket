@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { isFinished, isInProgress, matchBadge, matchWinner } from '../matchStatus'
+import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout } from '../matchStatus'
 import Shootout from './Shootout'
 import './MatchCard.css'
 
@@ -18,9 +18,10 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
 
   const done = isFinished(match)
   const live = isInProgress(match)
-  const badge = matchBadge(match)
   const showScore = live || done
   const winner = matchWinner(match)
+  const shootout = penaltyShootout(match)
+  const status = matchStatus(match)
 
   const homeName = match.homeTeam?.name ?? 'TBD'
   const awayName = match.awayTeam?.name ?? 'TBD'
@@ -28,7 +29,7 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const awayFlag = match.awayTeam?.flag ?? null
   const homeScore = match.homeScore
   const awayScore = match.awayScore
-  const dateStr   = !done && !live ? parseDate(match.date) : null
+  const dateStr   = parseDate(match.date)
 
   return (
     <div
@@ -36,11 +37,6 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
       className={`match-card${big ? ' big' : ''}${live ? ' live' : ''}${done ? ' done' : ''}${highlight ? ' highlight' : ''}`}
       style={accentColor ? { '--accent': accentColor } : {}}
     >
-      <div className="card-header">
-        {badge && <span className={badge.className}>{badge.text}</span>}
-        {dateStr && <span className="kickoff-date">{dateStr}</span>}
-      </div>
-
       <div className={`team-row${winner === 'home' ? ' winner' : ''}`}>
         {homeFlag && <img src={homeFlag} alt="" className="flag" />}
         <span className="team-name">{homeName}</span>
@@ -54,7 +50,20 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
         {showScore && <span className="score">{awayScore ?? 0}</span>}
       </div>
 
-      <Shootout match={match} />
+      {/* Fixed-height status bar. Penalties render here too, so shootout
+          cards stay the same height as every other card. */}
+      <div className={`card-status status-${status.state}`}>
+        {shootout ? (
+          <Shootout match={match} size="bar" />
+        ) : status.label ? (
+          <span className="status-line">
+            {status.state === 'live' && <span className="status-dot" />}
+            {status.label}
+          </span>
+        ) : (
+          <span className="status-line status-date">{dateStr}</span>
+        )}
+      </div>
     </div>
   )
 })

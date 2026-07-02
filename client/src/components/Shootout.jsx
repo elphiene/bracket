@@ -16,10 +16,12 @@ export default function Shootout({ match, size }) {
   if (!so) return null
 
   const winner = matchWinner(match)
+  const cls = size === 'lg' ? ' lg' : size === 'bar' ? ' bar' : ''
 
   return (
-    <div className={`shootout${size === 'lg' ? ' lg' : ''}`}>
-      <span className="so-label">Penalties</span>
+    <div className={`shootout${cls}`}>
+      {size !== 'bar' && <span className="so-label">Penalties</span>}
+      {size === 'bar' && <span className="so-tag">PENS</span>}
       <div className="so-rows">
         {['home', 'away'].map(side => {
           const team = so[side]

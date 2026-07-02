@@ -62,8 +62,51 @@
   color: #fff;
 }
 
-/* Larger pips inside the focused (big) bracket card */
-.match-card.big .shootout .so-pip {
+/* ── Compact "bar" variant (inside the fixed-height status bar) ────── */
+.shootout.bar {
+  border-top: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.so-tag {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #6b8099;
+  flex-shrink: 0;
+}
+.shootout.bar .so-rows {
+  gap: 2px;
+}
+.shootout.bar .so-row {
+  gap: 5px;
+  line-height: 1;
+}
+.shootout.bar .so-pips {
+  flex: none;
+  flex-wrap: nowrap;      /* keep the bar one fixed height */
+  overflow: hidden;
+}
+.shootout.bar .so-pip {
+  width: 6px;
+  height: 6px;
+}
+.shootout.bar .so-count {
+  font-size: 9px;
+  min-width: 9px;
+  line-height: 1;
+}
+.match-card.big .shootout.bar .so-pip {
+  width: 7px;
+  height: 7px;
+}
+
+/* Larger pips inside the focused (big) bracket card (non-bar) */
+.match-card.big .shootout:not(.bar) .so-pip {
   width: 9px;
   height: 9px;
 }

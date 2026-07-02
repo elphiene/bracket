@@ -14,16 +14,11 @@
 .match-card.big.placeholder {
   min-height: 96px;
 }
-.match-card.big .card-header {
-  padding: 7px 12px 3px;
-  min-height: 22px;
+.match-card.big .card-status {
+  min-height: 34px;
 }
-.match-card.big .status-live,
-.match-card.big .status-minute,
-.match-card.big .status-phase,
-.match-card.big .status-ft,
-.match-card.big .kickoff-date {
-  font-size: 11px;
+.match-card.big .status-line {
+  font-size: 12px;
 }
 .match-card.big .team-row {
   padding: 7px 12px;
@@ -61,57 +56,44 @@
   min-height: 72px;
 }
 
-/* ── Status strip ─────────────────────────────── */
-.card-header {
+/* ── Status bar (fixed height for every state) ──── */
+/* Same height whether it shows a status word, a date, or the penalties,
+   so shootout cards are never taller than the rest. */
+.card-status {
+  min-height: 30px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px 2px;
-  min-height: 18px;
+  justify-content: center;
+  padding: 4px 8px;
+  border-top: 1px solid #16202c;
+  background: #1a2432;
 }
 
-.status-live {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  background: #f85149;
-  color: #fff;
-  padding: 1px 5px;
-  border-radius: 2px;
-  animation: pulse 1.4s ease-in-out infinite;
+.status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b8099;
 }
 
-.status-minute {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  background: #2ea043;
-  color: #fff;
-  padding: 1px 5px;
-  border-radius: 2px;
-  animation: pulse 1.4s ease-in-out infinite;
-}
-
-.status-phase {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  background: #d29922;
-  color: #1a1207;
-  padding: 1px 5px;
-  border-radius: 2px;
-}
-
-.status-ft {
-  font-size: 9px;
+.card-status.status-ft .status-line,
+.card-status.status-live .status-line {
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #4a5a70;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
+.card-status.status-ft .status-line { color: #566779; }
+.card-status.status-live .status-line { color: #f0f6fc; }
 
-.kickoff-date {
-  font-size: 9px;
-  color: #4a5a70;
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f85149;
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 /* ── Team rows ──────────────────────────────────── */
@@ -188,15 +170,11 @@
   .round-cards > .match-card.big {
     width: calc(50% - 6px);
   }
-  .match-card.big .card-header { padding: 4px 8px 2px; min-height: 18px; }
-  .match-card.big .status-live,
-  .match-card.big .status-minute,
-  .match-card.big .status-phase,
-  .match-card.big .status-ft,
-  .match-card.big .kickoff-date { font-size: 9px; }
   .match-card.big .team-row { padding: 4px 8px; }
   .match-card.big .flag { width: 18px; height: 13px; }
   .match-card.big .team-name { font-size: 13px; }
   .match-card.big .score { font-size: 16px; min-width: 18px; }
+  .match-card.big .card-status { min-height: 30px; }
+  .match-card.big .status-line { font-size: 11px; }
   .match-card.big.placeholder { min-height: 72px; }
 }
