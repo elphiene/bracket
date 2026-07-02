@@ -5,6 +5,11 @@
   overflow-x: hidden;
   padding: 8px clamp(10px, 3vw, 24px) 40px;
   scroll-behavior: smooth;
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* legacy Edge/IE */
+}
+.bracket-scroll::-webkit-scrollbar {
+  display: none;              /* Chrome / Safari */
 }
 
 /* ── Round section ────────────────────────────── */
