@@ -10,6 +10,7 @@ import './App.css'
 
 export default function App() {
   const { allMatches, knockoutMatches, liveMatches, groups, config, loading, error } = useMatches()
+  const groupMatches = allMatches.filter(m => m.round === 'group')
 
   // Inject tournament accent colour as a CSS variable so all components pick it up.
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function App() {
           )}
         </div>
 
-        {config.hasGroups && <GroupResults groups={groups} />}
+        {config.hasGroups && <GroupResults groups={groups} matches={groupMatches} />}
 
         <Footer />
       </div>

@@ -82,8 +82,14 @@ function parseVenueKickoff(raw, stadiumId) {
 }
 
 function normaliseMatch(raw, teamById) {
-  const group = raw.home_team_label?.match(/Group ([A-L])/)?.[1] ?? null
   const round = (!raw.type || raw.type === 'group') ? 'group' : raw.type
+  // For group-stage matches, upstream's `group` field is the real letter
+  // ("A"). For knockout matches that same field is overloaded as a round
+  // code ("R32"), so group colour-tagging there instead comes from parsing
+  // placeholder labels like "Winner Group E" off home_team_label.
+  const group = round === 'group'
+    ? (raw.group ?? null)
+    : (raw.home_team_label?.match(/Group ([A-L])/)?.[1] ?? null)
   const homeT = teamById?.get(String(raw.home_team_id))
   const awayT = teamById?.get(String(raw.away_team_id))
   return {

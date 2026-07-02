@@ -36,12 +36,18 @@
 
 .groups-panel {
   width: 100%;
+  /* vh is measured against the largest possible viewport on mobile browsers
+     (ignoring the address bar), so a sheet sized off it can extend below
+     what's actually visible once the bar is showing. dvh tracks the real,
+     currently-visible viewport; vh stays as a fallback for browsers that
+     don't support dvh yet. */
   max-height: 88vh;
+  max-height: 88dvh;
   overflow-y: auto;
   background: #0d1117;
   border-top: 1px solid #21262d;
   border-radius: 14px 14px 0 0;
-  padding: 0 clamp(10px, 3vw, 24px) 24px;
+  padding: 0 clamp(10px, 3vw, 24px) calc(24px + env(safe-area-inset-bottom, 0px));
   animation: groups-slide 0.2s ease;
 }
 
@@ -169,4 +175,99 @@
 .pts {
   font-weight: 700;
   color: #f7b731 !important;
+}
+
+/* ── Standings / Results tabs ─────────────────────────────────────── */
+.view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.view-tab {
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 5px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.view-tab:hover {
+  color: #e6edf3;
+  border-color: #8b949e;
+}
+
+.view-tab.active {
+  background: var(--accent-primary, #f7b731);
+  border-color: var(--accent-primary, #f7b731);
+  color: #0d1117;
+}
+
+/* ── Group fixtures (Results view) ────────────────────────────────── */
+.group-fixtures {
+  padding: 4px 0 6px;
+}
+
+.fixture-row {
+  padding: 6px 12px;
+  border-bottom: 1px solid #21262d;
+}
+
+.fixture-row:last-child {
+  border-bottom: none;
+}
+
+.fixture-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fixture-team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.fixture-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fixture-score {
+  font-weight: 700;
+  color: #e6edf3;
+  min-width: 14px;
+  text-align: right;
+}
+
+.fixture-winner .fixture-name,
+.fixture-winner .fixture-score {
+  font-weight: 800;
+  color: #fff;
+}
+
+.fixture-date {
+  display: block;
+  font-size: 9px;
+  color: #484f58;
+  margin-top: 3px;
+}
+
+.fixture-empty {
+  padding: 12px;
+  text-align: center;
+  font-size: 11px;
+  color: #484f58;
 }
