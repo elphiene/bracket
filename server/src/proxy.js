@@ -24,20 +24,61 @@ const ROUND_LABELS = {
   sf:'Semi-finals', third:'3rd Place', final:'Final',
 }
 
-// worldcup26.ir publishes kickoff times in Iran Standard Time (UTC+3:30,
-// fixed — Iran abolished DST in 2022): local_date and persian_date always
-// carry the identical clock digits, just in the Gregorian vs. Jalali
-// calendar, confirming it's one fixed source zone rather than per-venue
-// local time. Convert to a real UTC instant here so the client can render
-// it in whatever timezone the viewer picks, instead of echoing Iran time.
-const IRAN_OFFSET_MINUTES = 3 * 60 + 30
+// worldcup26.ir's local_date is the STADIUM's own local wall-clock kickoff
+// time, not a single fixed source-timezone offset. (persian_date carrying
+// the same clock digits as local_date is a red herring — that's just the
+// Gregorian→Jalali *calendar* conversion, which never touches the time of
+// day.) Upstream doesn't expose a per-match timezone, so it's hardcoded here
+// from the fixed 16-venue World Cup 2026 list (`/get/stadiums`).
+const STADIUM_TIMEZONE = {
+  '1':  'America/Mexico_City', // Estadio Azteca, Mexico City
+  '2':  'America/Mexico_City', // Estadio Akron, Guadalajara
+  '3':  'America/Monterrey',   // Estadio BBVA, Monterrey
+  '4':  'America/Chicago',     // AT&T Stadium, Dallas
+  '5':  'America/Chicago',     // NRG Stadium, Houston
+  '6':  'America/Chicago',     // Arrowhead Stadium, Kansas City
+  '7':  'America/New_York',    // Mercedes-Benz Stadium, Atlanta
+  '8':  'America/New_York',    // Hard Rock Stadium, Miami
+  '9':  'America/New_York',    // Gillette Stadium, Boston
+  '10': 'America/New_York',    // Lincoln Financial Field, Philadelphia
+  '11': 'America/New_York',    // MetLife Stadium, New York/New Jersey
+  '12': 'America/Toronto',     // BMO Field, Toronto
+  '13': 'America/Vancouver',   // BC Place, Vancouver
+  '14': 'America/Los_Angeles', // Lumen Field, Seattle
+  '15': 'America/Los_Angeles', // Levi's Stadium, San Francisco Bay Area
+  '16': 'America/Los_Angeles', // SoFi Stadium, Los Angeles
+}
+const DEFAULT_TIMEZONE = 'America/New_York' // fallback if stadium_id is ever missing/unrecognised
 
-function parseIranKickoff(raw) {
+// Convert a wall-clock date/time in a given IANA zone to a UTC epoch ms,
+// using only the built-in Intl API (no timezone library / DB needed).
+// Standard "guess, measure the round-trip error, correct" approach — two
+// passes always converge except within the DST-transition hour itself,
+// which doesn't matter for scheduled kickoff times.
+function zonedWallTimeToUtcMs(y, mo, d, h, mi, timeZone) {
+  // Target wall-clock time, provisionally labeled as UTC — fixed reference
+  // point we're trying to match against `timeZone`'s rendering of our guess.
+  const wallAsUtc = Date.UTC(y, mo - 1, d, h, mi)
+  let utcGuess = wallAsUtc
+  for (let i = 0; i < 2; i++) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(new Date(utcGuess))
+    const p = Object.fromEntries(parts.map(x => [x.type, x.value]))
+    const localAsUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)
+    utcGuess += wallAsUtc - localAsUtc
+  }
+  return utcGuess
+}
+
+function parseVenueKickoff(raw, stadiumId) {
   const m = typeof raw === 'string' && raw.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/)
   if (!m) return null
   const [mo, d, y, h, mi] = m.slice(1).map(Number)
-  const utcMs = Date.UTC(y, mo - 1, d, h, mi) - IRAN_OFFSET_MINUTES * 60_000
-  return new Date(utcMs).toISOString()
+  const timeZone = STADIUM_TIMEZONE[String(stadiumId)] ?? DEFAULT_TIMEZONE
+  return new Date(zonedWallTimeToUtcMs(y, mo, d, h, mi, timeZone)).toISOString()
 }
 
 function normaliseMatch(raw, teamById) {
@@ -60,7 +101,7 @@ function normaliseMatch(raw, teamById) {
     },
     homeScore:  raw.home_score != null ? Number(raw.home_score) : null,
     awayScore:  raw.away_score != null ? Number(raw.away_score) : null,
-    date:       parseIranKickoff(raw.local_date),
+    date:       parseVenueKickoff(raw.local_date, raw.stadium_id),
     status:     raw.time_elapsed === 'live' ? 'live'
                 : (raw.finished === 'TRUE' || raw.time_elapsed === 'finished' || raw.time_elapsed === 'Finished')
                   ? 'finished' : 'scheduled',
