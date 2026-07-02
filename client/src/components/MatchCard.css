@@ -176,3 +176,27 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
 }
+
+/* ── Mobile: two cards per row, even in the focused round ──────────── */
+/* The focused round's `big` cards are too wide to sit two-up on a phone,
+   so they stack. Here we force a clean two-column grid (the .round-cards
+   gap is 12px, so 50% - 6px fits exactly two) and drop the size bump so
+   the bigger fonts don't overflow the narrower card. Focus is still shown
+   via round opacity, the larger round title, and the NOW badge. */
+@media (max-width: 520px) {
+  .round-cards > .match-card,
+  .round-cards > .match-card.big {
+    width: calc(50% - 6px);
+  }
+  .match-card.big .card-header { padding: 4px 8px 2px; min-height: 18px; }
+  .match-card.big .status-live,
+  .match-card.big .status-minute,
+  .match-card.big .status-phase,
+  .match-card.big .status-ft,
+  .match-card.big .kickoff-date { font-size: 9px; }
+  .match-card.big .team-row { padding: 4px 8px; }
+  .match-card.big .flag { width: 18px; height: 13px; }
+  .match-card.big .team-name { font-size: 13px; }
+  .match-card.big .score { font-size: 16px; min-width: 18px; }
+  .match-card.big.placeholder { min-height: 72px; }
+}
