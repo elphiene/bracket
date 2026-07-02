@@ -118,16 +118,27 @@
 
 .group-table {
   width: 100%;
+  /* Fixed layout + explicit per-column widths below so the last column
+     (Pts) always has guaranteed room — auto layout only sizes columns to
+     fit content, and with barely any slack, a scrollbar's width, a
+     browser zoom level, or slight font-rendering differences was enough
+     to push Pts past the card's overflow:hidden edge and clip it. */
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 11px;
 }
 
+.group-table col.col-team-w  { width: 38%; }
+.group-table col.col-stat-w  { width: 9%; }
+.group-table col.col-wide-w  { width: 13%; }
+
 .group-table th {
-  padding: 4px 6px;
+  padding: 4px 4px;
   color: #484f58;
   font-weight: 600;
   text-align: right;
   border-bottom: 1px solid #21262d;
+  overflow: hidden;
 }
 
 .group-table th:first-child,
@@ -136,10 +147,11 @@
 }
 
 .group-table td {
-  padding: 5px 6px;
+  padding: 5px 4px;
   color: #8b949e;
   text-align: right;
   border-bottom: 1px solid #21262d;
+  overflow: hidden;
 }
 
 .group-table tr:last-child td {

@@ -89,6 +89,15 @@ export default function GroupResults({ groups, matches }) {
 
                   {view === 'standings' ? (
                     <table className="group-table">
+                      <colgroup>
+                        <col className="col-team-w" />
+                        <col className="col-stat-w" />
+                        <col className="col-stat-w" />
+                        <col className="col-stat-w" />
+                        <col className="col-stat-w" />
+                        <col className="col-wide-w" />
+                        <col className="col-wide-w" />
+                      </colgroup>
                       <thead>
                         <tr>
                           <th className="col-team"></th>
