@@ -1,0 +1,33 @@
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px clamp(10px, 3vw, 24px);
+  font-size: 10px;
+  color: #484f58;
+  border-top: 1px solid #161b22;
+  flex-shrink: 0;
+}
+
+.site-footer a {
+  color: #6b8099;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: #e6edf3;
+  text-decoration: underline;
+}
+
+.footer-sep {
+  color: #30363d;
+}
+
+@media (max-width: 520px) {
+  .site-footer {
+    font-size: 9px;
+    gap: 4px;
+  }
+}

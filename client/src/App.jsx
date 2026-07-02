@@ -5,6 +5,7 @@ import Bracket from './components/Bracket'
 import LiveFocusView from './components/LiveFocusView'
 import GroupResults from './components/GroupResults'
 import TimezoneSelect from './components/TimezoneSelect'
+import Footer from './components/Footer'
 import './App.css'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
     return (
       <div className="app">
         <div className="loading">Loading…</div>
+        <Footer />
       </div>
     )
   }
@@ -49,6 +51,8 @@ export default function App() {
         </div>
 
         {config.hasGroups && <GroupResults groups={groups} />}
+
+        <Footer />
       </div>
     </TimezoneProvider>
   )
