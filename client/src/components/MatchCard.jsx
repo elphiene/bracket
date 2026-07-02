@@ -1,17 +1,13 @@
 import { forwardRef } from 'react'
 import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout } from '../matchStatus'
+import { useTimezone } from '../hooks/useTimezone'
+import { formatKickoff } from '../timeFormat'
 import Shootout from './Shootout'
 import './MatchCard.css'
 
-function parseDate(localDate) {
-  if (!localDate) return null
-  const m = localDate.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/)
-  if (!m) return null
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  return `${months[parseInt(m[1]) - 1]} ${parseInt(m[2])} · ${m[4]}`
-}
-
 const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight, big }, ref) {
+  const { timezone } = useTimezone()
+
   if (!match) {
     return <div ref={ref} className={`match-card placeholder${big ? ' big' : ''}`}>TBD</div>
   }
@@ -29,7 +25,7 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const awayFlag = match.awayTeam?.flag ?? null
   const homeScore = match.homeScore
   const awayScore = match.awayScore
-  const dateStr   = parseDate(match.date)
+  const dateStr   = formatKickoff(match.date, timezone)
 
   return (
     <div

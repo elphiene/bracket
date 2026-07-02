@@ -1,0 +1,38 @@
+.tz-select {
+  position: absolute;
+  right: clamp(10px, 3vw, 20px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 38vw;
+  background: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font: inherit;
+  font-size: 11px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tz-select:hover,
+.tz-select:focus {
+  border-color: #8b949e;
+  color: #e6edf3;
+}
+
+.tz-select option {
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+@media (max-width: 520px) {
+  .tz-select {
+    position: static;
+    transform: none;
+    flex-basis: 100%;
+    max-width: 70vw;
+    margin: 0 auto;
+    font-size: 10px;
+    padding: 3px 5px;
+  }
+}

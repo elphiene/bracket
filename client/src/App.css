@@ -6,6 +6,7 @@
 }
 
 .site-header {
+  position: relative;
   display: flex;
   align-items: baseline;
   justify-content: center;
@@ -44,6 +45,12 @@
   .header-eyebrow,
   .header-sub {
     display: none;
+  }
+  /* Drop the timezone select into its own centered row instead of
+     floating over the title — there isn't room for both side by side. */
+  .site-header {
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 }
 

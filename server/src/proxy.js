@@ -24,6 +24,22 @@ const ROUND_LABELS = {
   sf:'Semi-finals', third:'3rd Place', final:'Final',
 }
 
+// worldcup26.ir publishes kickoff times in Iran Standard Time (UTC+3:30,
+// fixed — Iran abolished DST in 2022): local_date and persian_date always
+// carry the identical clock digits, just in the Gregorian vs. Jalali
+// calendar, confirming it's one fixed source zone rather than per-venue
+// local time. Convert to a real UTC instant here so the client can render
+// it in whatever timezone the viewer picks, instead of echoing Iran time.
+const IRAN_OFFSET_MINUTES = 3 * 60 + 30
+
+function parseIranKickoff(raw) {
+  const m = typeof raw === 'string' && raw.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/)
+  if (!m) return null
+  const [mo, d, y, h, mi] = m.slice(1).map(Number)
+  const utcMs = Date.UTC(y, mo - 1, d, h, mi) - IRAN_OFFSET_MINUTES * 60_000
+  return new Date(utcMs).toISOString()
+}
+
 function normaliseMatch(raw, teamById) {
   const group = raw.home_team_label?.match(/Group ([A-L])/)?.[1] ?? null
   const round = (!raw.type || raw.type === 'group') ? 'group' : raw.type
@@ -44,7 +60,7 @@ function normaliseMatch(raw, teamById) {
     },
     homeScore:  raw.home_score != null ? Number(raw.home_score) : null,
     awayScore:  raw.away_score != null ? Number(raw.away_score) : null,
-    date:       raw.local_date ?? null,
+    date:       parseIranKickoff(raw.local_date),
     status:     raw.time_elapsed === 'live' ? 'live'
                 : (raw.finished === 'TRUE' || raw.time_elapsed === 'finished' || raw.time_elapsed === 'Finished')
                   ? 'finished' : 'scheduled',
