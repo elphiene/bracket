@@ -3,7 +3,7 @@ import { fetchConfig, fetchMatches, fetchGroups } from '../api'
 import { isInProgress } from '../matchStatus'
 
 const TTL_LIVE = 30_000
-const TTL_IDLE = 300_000
+const TTL_IDLE = 60_000   // poll every 60s while idle so a kickoff is caught quickly
 
 const DEFAULT_CONFIG = {
   name: 'Live Brackets',

@@ -2,8 +2,9 @@
 // Endpoints: /get/games, /get/groups, /get/teams — no auth required
 const UPSTREAM = process.env.UPSTREAM_URL || 'https://worldcup26.ir'
 
-const TTL_LIVE = 30_000   // 30s when a match is live
-const TTL_IDLE = 300_000  // 5min otherwise
+const TTL_LIVE  = 30_000     // 30s when a match is live
+const TTL_IDLE  = 60_000     // 60s otherwise — keeps not-live→live transitions snappy
+const TTL_TEAMS = 3_600_000  // teams rarely change; refresh hourly
 
 let cache = {
   matches: { data: null, fetchedAt: 0 },
@@ -157,7 +158,7 @@ export async function getGroups(req, res) {
 
 export async function getTeams(req, res) {
   try {
-    if (teamsCache.data && Date.now() - teamsCache.fetchedAt < TTL_IDLE * 12) {
+    if (teamsCache.data && Date.now() - teamsCache.fetchedAt < TTL_TEAMS) {
       return res.json(teamsCache.data)
     }
     const teams = await ensureTeams()
