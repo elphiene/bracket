@@ -1,6 +1,6 @@
-import { useCallback, useRef, useEffect, useMemo } from 'react'
+import { useCallback, useRef, useEffect, useMemo, useState } from 'react'
 import MatchCard from './MatchCard'
-import { isInProgress } from '../matchStatus'
+import { isInProgress, isFinished } from '../matchStatus'
 import './Bracket.css'
 
 // Which round should be in focus: the live round, else the earliest
@@ -34,6 +34,20 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
   }, [allMatches])
 
   const focusKey = currentRoundKey(rounds)
+
+  // Rounds where every match is done collapse to a dropdown by default (unless
+  // it's the focus round — e.g. the final, once played, stays open since
+  // there's nothing else to focus on). `toggled` flips a round's default.
+  const [toggled, setToggled] = useState(() => new Set())
+  const toggleRound = useCallback(key => {
+    setToggled(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }, [])
+
   const scrollRef = useRef()
   const focusRef = useRef()
   const didInitialScroll = useRef(false)
@@ -61,37 +75,48 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
         const mainMatches = matches.filter(m => m.round !== 'third')
         const thirdMatch  = matches.find(m => m.round === 'third')
 
+        const roundDone = matches.every(isFinished)
+        const openByDefault = !(roundDone && !isFocus)
+        const isOpen = toggled.has(key) ? !openByDefault : openByDefault
+        const HeadTag = roundDone ? 'button' : 'div'
+
         return (
           <section
             key={key}
             ref={isFocus ? focusRef : null}
-            className={`round-section${isFocus ? ' round-current' : ''}`}
+            className={`round-section${isFocus ? ' round-current' : ''}${!isOpen ? ' round-collapsed' : ''}`}
           >
-            <div className="round-head">
+            <HeadTag
+              className={`round-head${roundDone ? ' round-head-btn' : ''}`}
+              {...(roundDone ? { onClick: () => toggleRound(key) } : {})}
+            >
               <span className="round-name">{label}</span>
               {isFocus && isInProgress(matches.find(isInProgress)) && (
                 <span className="round-badge">NOW</span>
               )}
-            </div>
+              {roundDone && <span className="round-chevron">{isOpen ? '▲' : '▼'}</span>}
+            </HeadTag>
 
-            <div className="round-cards">
-              {mainMatches.map(match => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  big={isFocus}
-                  accentColor={match.groupColor ?? undefined}
-                  highlight={highlightId != null && match.id === String(highlightId)}
-                  ref={isInProgress(match) ? el => handleRef(match.id, el) : null}
-                />
-              ))}
-              {thirdMatch && (
-                <div className="third-wrap">
-                  <MatchCard match={thirdMatch} big={isFocus} />
-                  <div className="third-label">3rd place</div>
-                </div>
-              )}
-            </div>
+            {isOpen && (
+              <div className="round-cards">
+                {mainMatches.map(match => (
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    big={isFocus}
+                    accentColor={match.groupColor ?? undefined}
+                    highlight={highlightId != null && match.id === String(highlightId)}
+                    ref={isInProgress(match) ? el => handleRef(match.id, el) : null}
+                  />
+                ))}
+                {thirdMatch && (
+                  <div className="third-wrap">
+                    <MatchCard match={thirdMatch} big={isFocus} />
+                    <div className="third-label">3rd place</div>
+                  </div>
+                )}
+              </div>
+            )}
           </section>
         )
       })}
