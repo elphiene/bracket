@@ -35,6 +35,52 @@
   min-width: 24px;
 }
 
+/* ── Focus round fill mode ─────────────────────── */
+/* Bracket.jsx stretches the focus round's cards to fill the leftover screen
+   space (see Bracket.css); these vh-based clamps let the card's own content
+   grow along with it instead of leaving the extra height blank. */
+.round-current .round-cards .team-row {
+  flex: 1;
+  min-height: 0;
+  padding: clamp(6px, 1.6vh, 22px) clamp(10px, 2vw, 26px);
+}
+
+.round-current .round-cards .flag {
+  width: clamp(24px, 4.6vh, 68px);
+  height: clamp(17px, 3.3vh, 48px);
+}
+
+.round-current .round-cards .team-name {
+  font-size: clamp(16px, 3.2vh, 46px);
+}
+
+.round-current .round-cards .score {
+  font-size: clamp(20px, 4.2vh, 62px);
+  min-width: clamp(24px, 4.2vh, 58px);
+}
+
+.round-current .round-cards .trophy {
+  font-size: clamp(14px, 2.6vh, 34px);
+}
+
+.round-current .round-cards .card-status {
+  flex: 0 0 auto;
+  min-height: clamp(30px, 5.5vh, 68px);
+  padding: clamp(4px, 1.2vh, 16px) 10px;
+}
+
+.round-current .round-cards .status-line {
+  font-size: clamp(11px, 1.9vh, 24px);
+}
+
+.round-current .round-cards .upcoming-label {
+  font-size: clamp(9px, 1.5vh, 17px);
+}
+
+.round-current .round-cards .upcoming-meta {
+  font-size: clamp(10px, 1.7vh, 19px);
+}
+
 .match-card.live {
   border-left-color: #f85149;
   box-shadow: 0 0 0 1px rgba(248, 81, 73, 0.3);

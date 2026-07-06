@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect, useMemo, useState } from 'react'
 import MatchCard from './MatchCard'
-import { isInProgress, isFinished } from '../matchStatus'
+import { isInProgress } from '../matchStatus'
 import './Bracket.css'
 
 // Which round should be in focus: the live round, else the earliest
@@ -35,9 +35,9 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
 
   const focusKey = currentRoundKey(rounds)
 
-  // Rounds where every match is done collapse to a dropdown by default (unless
-  // it's the focus round — e.g. the final, once played, stays open since
-  // there's nothing else to focus on). `toggled` flips a round's default.
+  // Only the focus round is open by default — every other round collapses to
+  // a dropdown so the focus round can expand to fill the available screen
+  // space. `toggled` flips a round's default open/closed state.
   const [toggled, setToggled] = useState(() => new Set())
   const toggleRound = useCallback(key => {
     setToggled(prev => {
@@ -75,10 +75,9 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
         const mainMatches = matches.filter(m => m.round !== 'third')
         const thirdMatch  = matches.find(m => m.round === 'third')
 
-        const roundDone = matches.every(isFinished)
-        const openByDefault = !(roundDone && !isFocus)
-        const isOpen = toggled.has(key) ? !openByDefault : openByDefault
-        const HeadTag = roundDone ? 'button' : 'div'
+        const collapsible = !isFocus
+        const isOpen = toggled.has(key) ? !isFocus : isFocus
+        const HeadTag = collapsible ? 'button' : 'div'
 
         return (
           <section
@@ -87,14 +86,14 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
             className={`round-section${isFocus ? ' round-current' : ''}${!isOpen ? ' round-collapsed' : ''}`}
           >
             <HeadTag
-              className={`round-head${roundDone ? ' round-head-btn' : ''}`}
-              {...(roundDone ? { onClick: () => toggleRound(key) } : {})}
+              className={`round-head${collapsible ? ' round-head-btn' : ''}`}
+              {...(collapsible ? { onClick: () => toggleRound(key) } : {})}
             >
               <span className="round-name">{label}</span>
               {isFocus && isInProgress(matches.find(isInProgress)) && (
                 <span className="round-badge">NOW</span>
               )}
-              {roundDone && <span className="round-chevron">{isOpen ? '▲' : '▼'}</span>}
+              {collapsible && <span className="round-chevron">{isOpen ? '▲' : '▼'}</span>}
             </HeadTag>
 
             {isOpen && (
