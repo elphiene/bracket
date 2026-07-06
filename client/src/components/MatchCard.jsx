@@ -26,6 +26,8 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const homeScore = match.homeScore
   const awayScore = match.awayScore
   const dateStr   = formatKickoff(match.date, timezone)
+  const venueName = match.venue?.name ?? null
+  const venueCity = match.venue?.city ?? null
 
   return (
     <div
@@ -57,7 +59,16 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
             {status.label}
           </span>
         ) : (
-          <span className="status-line status-date">{dateStr}</span>
+          <div
+            className="upcoming-info"
+            title={venueName ? `${venueName}${venueCity ? `, ${venueCity}` : ''}` : undefined}
+          >
+            <span className="upcoming-label">Upcoming</span>
+            <span className="upcoming-meta">
+              {venueName && <span className="upcoming-venue">{venueName}</span>}
+              {dateStr && <span className="upcoming-date">{dateStr}</span>}
+            </span>
+          </div>
         )}
       </div>
     </div>

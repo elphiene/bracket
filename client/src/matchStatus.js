@@ -24,6 +24,12 @@ export function isInProgress(match) {
   return v !== '' && v !== 'notstarted'
 }
 
+// True once both sides are real teams rather than TBD bracket placeholders
+// (upstream gives TBD slots id "0" and no flag, e.g. "Winner Match 93").
+export function isDecided(match) {
+  return Boolean(match?.homeTeam?.flag && match?.awayTeam?.flag)
+}
+
 function inPenalties(match) {
   const p = match?.home_penalty_score
   return p != null && p !== 'null' && p !== ''
