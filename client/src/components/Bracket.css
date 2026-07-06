@@ -7,6 +7,8 @@
   scroll-behavior: smooth;
   scrollbar-width: none;      /* Firefox */
   -ms-overflow-style: none;   /* legacy Edge/IE */
+  display: flex;
+  flex-direction: column;
 }
 .bracket-scroll::-webkit-scrollbar {
   display: none;              /* Chrome / Safari */
@@ -14,6 +16,8 @@
 
 /* ── Round section ────────────────────────────── */
 .round-section {
+  flex: 0 0 auto;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 14px 0;
@@ -26,8 +30,19 @@
   border-bottom: none;
 }
 
+/* The focus round grows to fill whatever space the collapsed rounds leave
+   behind — every other round is collapsed by default (see Bracket.jsx) so
+   there's room for it to do that. No min-height:0 here (deliberately, unlike
+   .bracket-scroll): this section must never shrink below its cards' natural
+   size, or overflowing content spills into the sections below it instead of
+   the whole page falling back to .bracket-scroll's scroll. */
 .round-current {
+  flex: 1 1 auto;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
   opacity: 1;
+  border-bottom: none;
 }
 
 .round-head {
@@ -116,4 +131,42 @@
   text-transform: uppercase;
   text-align: center;
   margin-top: 5px;
+}
+
+/* ── Focus round: fill the available space ─────── */
+/* A grid instead of wrapped flex so cards stretch to fill both the width
+   AND height of whatever room the collapsed rounds leave — auto-fit
+   collapses unused column tracks, so e.g. a lone Final match takes the
+   full width/height rather than sitting at its normal card size. */
+.round-current .round-cards {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* minmax floor (not a bare 1fr) so rows stop shrinking once cards hit
+     their natural min size — e.g. 8 cards stacked to one narrow mobile
+     column would otherwise get squashed into equal slivers and overlap.
+     Combined with no min-height:0 above, once content no longer fits,
+     .bracket-scroll's overflow-y takes over instead of anything crushing
+     or spilling into the sections below. */
+  grid-auto-rows: minmax(min-content, 1fr);
+  align-content: stretch;
+  gap: clamp(12px, 2vw, 28px);
+}
+
+.round-current .round-cards > .match-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.round-current .round-cards > .third-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.round-current .round-cards > .third-wrap > .match-card {
+  flex: 1;
+  min-height: 0;
+  height: auto;
 }
