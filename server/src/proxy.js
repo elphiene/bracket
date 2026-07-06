@@ -11,6 +11,7 @@ let cache = {
   groups:  { data: null, fetchedAt: 0 },
 }
 let teamsCache = { data: null, fetchedAt: 0 }
+let stadiumsCache = { data: null, fetchedAt: 0 }
 
 // ── Normalisation ──────────────────────────────────────────────────────────
 const WC_GROUP_COLORS = {
@@ -81,7 +82,7 @@ function parseVenueKickoff(raw, stadiumId) {
   return new Date(zonedWallTimeToUtcMs(y, mo, d, h, mi, timeZone)).toISOString()
 }
 
-function normaliseMatch(raw, teamById) {
+function normaliseMatch(raw, teamById, stadiumById) {
   const round = (!raw.type || raw.type === 'group') ? 'group' : raw.type
   // For group-stage matches, upstream's `group` field is the real letter
   // ("A"). For knockout matches that same field is overloaded as a round
@@ -92,6 +93,7 @@ function normaliseMatch(raw, teamById) {
     : (raw.home_team_label?.match(/Group ([A-L])/)?.[1] ?? null)
   const homeT = teamById?.get(String(raw.home_team_id))
   const awayT = teamById?.get(String(raw.away_team_id))
+  const stadium = stadiumById?.get(String(raw.stadium_id))
   return {
     // ── Normalised fields ───────────────────────────────────────────────────
     id:         String(raw.id),
@@ -108,6 +110,7 @@ function normaliseMatch(raw, teamById) {
     homeScore:  raw.home_score != null ? Number(raw.home_score) : null,
     awayScore:  raw.away_score != null ? Number(raw.away_score) : null,
     date:       parseVenueKickoff(raw.local_date, raw.stadium_id),
+    venue:      stadium ? { name: stadium.name_en, city: stadium.city_en } : null,
     status:     raw.time_elapsed === 'live' ? 'live'
                 : (raw.finished === 'TRUE' || raw.time_elapsed === 'finished' || raw.time_elapsed === 'Finished')
                   ? 'finished' : 'scheduled',
@@ -149,13 +152,23 @@ async function ensureTeams() {
   return teamsCache.data
 }
 
+// Stadium names/cities never change mid-tournament, so cache forever like teams.
+async function ensureStadiums() {
+  if (stadiumsCache.data) return stadiumsCache.data
+  const body = await fetchUpstream('/get/stadiums')
+  stadiumsCache = { data: body.stadiums, fetchedAt: Date.now() }
+  return stadiumsCache.data
+}
+
 async function refreshMatches() {
-  const [gamesBody, teams] = await Promise.all([
+  const [gamesBody, teams, stadiums] = await Promise.all([
     fetchUpstream('/get/games'),
     ensureTeams(),
+    ensureStadiums().catch(() => []),
   ])
   const teamById = new Map(teams.map(t => [String(t.id), t]))
-  const data = gamesBody.games.map(raw => normaliseMatch(raw, teamById))
+  const stadiumById = new Map(stadiums.map(s => [String(s.id), s]))
+  const data = gamesBody.games.map(raw => normaliseMatch(raw, teamById, stadiumById))
   cache.matches = { data, fetchedAt: Date.now() }
   return data
 }

@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useMatches } from './hooks/useMatches'
 import { TimezoneProvider } from './hooks/useTimezone'
+import { isFinished, isInProgress, isDecided } from './matchStatus'
 import Bracket from './components/Bracket'
 import LiveFocusView from './components/LiveFocusView'
+import UpcomingFocusView from './components/UpcomingFocusView'
 import GroupResults from './components/GroupResults'
 import TimezoneSelect from './components/TimezoneSelect'
 import Footer from './components/Footer'
@@ -11,6 +13,17 @@ import './App.css'
 export default function App() {
   const { allMatches, knockoutMatches, liveMatches, groups, config, loading, error } = useMatches()
   const groupMatches = allMatches.filter(m => m.round === 'group')
+
+  // The next kicked-off-but-unstarted match(es) with real (non-TBD) teams —
+  // more than one if several share the same earliest kickoff slot.
+  const nextMatches = useMemo(() => {
+    const upcoming = knockoutMatches
+      .filter(m => m.date && isDecided(m) && !isInProgress(m) && !isFinished(m))
+      .sort((a, b) => a.date.localeCompare(b.date))
+    if (!upcoming.length) return []
+    const soonest = upcoming[0].date
+    return upcoming.filter(m => m.date === soonest)
+  }, [knockoutMatches])
 
   // Inject tournament accent colour as a CSS variable so all components pick it up.
   useEffect(() => {
@@ -45,6 +58,11 @@ export default function App() {
             <LiveFocusView
               allMatches={knockoutMatches}
               liveMatches={liveMatches}
+            />
+          ) : nextMatches.length > 0 ? (
+            <UpcomingFocusView
+              allMatches={knockoutMatches}
+              nextMatches={nextMatches}
             />
           ) : (
             <Bracket allMatches={knockoutMatches} />
