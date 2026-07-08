@@ -133,40 +133,40 @@
   margin-top: 5px;
 }
 
-/* ── Focus round: fill the available space ─────── */
-/* A grid instead of wrapped flex so cards stretch to fill both the width
-   AND height of whatever room the collapsed rounds leave — auto-fit
-   collapses unused column tracks, so e.g. a lone Final match takes the
-   full width/height rather than sitting at its normal card size. */
+/* ── Focus round: centered, scaled to the display ─────── */
+/* Cards are sized to their content and centred in the leftover space rather
+   than stretched edge-to-edge. Stretching produced huge sparse boxes with the
+   teams pinned to the top/bottom and a void between them (and a letterboxed
+   single card for the Final). Card width scales with the viewport (bigger
+   screen → bigger cards) but is capped so four quarter-final cards still sit
+   in one row on a 1080p display; internal text scales via container units
+   (see MatchCard.css) so it fills the card at any size. */
 .round-current .round-cards {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  /* minmax floor (not a bare 1fr) so rows stop shrinking once cards hit
-     their natural min size — e.g. 8 cards stacked to one narrow mobile
-     column would otherwise get squashed into equal slivers and overlap.
-     Combined with no min-height:0 above, once content no longer fits,
-     .bracket-scroll's overflow-y takes over instead of anything crushing
-     or spilling into the sections below. */
-  grid-auto-rows: minmax(min-content, 1fr);
-  align-content: stretch;
-  gap: clamp(12px, 2vw, 28px);
-}
-
-.round-current .round-cards > .match-card {
-  width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: stretch;
+  gap: clamp(14px, 1.8vw, 34px);
 }
 
+.round-current .round-cards > .match-card,
 .round-current .round-cards > .third-wrap {
-  width: 100%;
-  height: 100%;
+  width: clamp(240px, 22vw, 440px);
+  height: auto;
 }
 
 .round-current .round-cards > .third-wrap > .match-card {
-  flex: 1;
-  min-height: 0;
-  height: auto;
+  width: 100%;
+  height: 100%;
+}
+
+/* Phones: focus cards go full-width, one per row (kept here so this width wins
+   over the viewport clamp above; MatchCard.css handles the matching fonts). */
+@media (max-width: 520px) {
+  .round-current .round-cards > .match-card,
+  .round-current .round-cards > .third-wrap {
+    width: 100%;
+  }
 }
