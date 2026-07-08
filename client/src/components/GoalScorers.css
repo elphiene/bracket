@@ -1,0 +1,80 @@
+.goal-scorers {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+}
+
+.gs-side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gs-home { align-items: flex-end; text-align: right; }
+.gs-away { align-items: flex-start; text-align: left; }
+
+.gs-ball {
+  flex-shrink: 0;
+  line-height: 1.1;
+  opacity: 0.85;
+}
+
+.gs-goal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  max-width: 100%;
+  color: #8b949e;
+}
+.gs-win .gs-goal { color: #e6edf3; }
+
+.gs-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.gs-min {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #6b8099;
+  font-variant-numeric: tabular-nums;
+}
+
+/* away side lists the minute before the name so both columns read outward
+   from the ball; fl: reverse the flex order for away. */
+.gs-away .gs-goal { flex-direction: row-reverse; }
+
+.gs-tag {
+  flex-shrink: 0;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #566779;
+}
+
+/* ── Card variant (focus round; card is a query container) ────────── */
+.goal-scorers.card {
+  padding: clamp(4px, 2.4cqw, 12px) clamp(8px, 3cqw, 18px) 0;
+  font-size: clamp(9px, 3.3cqw, 15px);
+}
+.goal-scorers.card .gs-ball { font-size: clamp(10px, 3.6cqw, 16px); }
+
+/* ── Hero variant (live-focus scoreboard) ─────────────────────────── */
+.goal-scorers.hero {
+  max-width: 620px;
+  margin: 14px auto 0;
+  padding: 12px 8px 0;
+  border-top: 1px solid #2d3d52;
+  font-size: clamp(12px, 1.6vw, 17px);
+  gap: 16px;
+}
+.goal-scorers.hero .gs-side { gap: 5px; }
+.goal-scorers.hero .gs-ball { font-size: 18px; }
+
+@media (max-width: 520px) {
+  .goal-scorers.hero { font-size: 12px; gap: 10px; margin-top: 10px; }
+}

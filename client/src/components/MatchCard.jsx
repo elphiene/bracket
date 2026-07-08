@@ -3,6 +3,7 @@ import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout } f
 import { useTimezone } from '../hooks/useTimezone'
 import { formatKickoff } from '../timeFormat'
 import Shootout from './Shootout'
+import GoalScorers from './GoalScorers'
 import './MatchCard.css'
 
 const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight, big }, ref) {
@@ -47,6 +48,10 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
         {winner === 'away' && <span className="trophy" title="Winner">🏆</span>}
         {showScore && <span className="score">{awayScore ?? 0}</span>}
       </div>
+
+      {/* Focus round only: goal scorers fill the taller card and add detail.
+          Renders nothing when the feed has no scorers. */}
+      {big && showScore && <GoalScorers match={match} size="card" />}
 
       {/* Fixed-height status bar. Penalties render here too, so shootout
           cards stay the same height as every other card. */}

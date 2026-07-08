@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Bracket from './Bracket'
 import Shootout from './Shootout'
+import GoalScorers from './GoalScorers'
 import './LiveFocusView.css'
 
 export default function LiveFocusView({ allMatches, liveMatches }) {
@@ -47,6 +48,7 @@ export default function LiveFocusView({ allMatches, liveMatches }) {
           </div>
         </div>
 
+        <GoalScorers match={live} size="hero" />
         <Shootout match={live} size="lg" />
       </div>
 

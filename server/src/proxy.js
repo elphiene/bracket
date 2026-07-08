@@ -130,6 +130,11 @@ function normaliseMatch(raw, teamById, stadiumById) {
     home_penalty_misses:  raw.home_penalty_misses,
     away_penalty_scorers: raw.away_penalty_scorers,
     away_penalty_misses:  raw.away_penalty_misses,
+    // Goal scorers, e.g. '{"F. Balogun 45\'+5\'","D. Bobadilla 7\'(OG)"}'.
+    // Quote style is inconsistent upstream (straight or smart quotes); parsed
+    // client-side by goalScorers() in matchStatus.js. Grows live across polls.
+    home_scorers: raw.home_scorers,
+    away_scorers: raw.away_scorers,
   }
 }
 

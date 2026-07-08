@@ -96,6 +96,46 @@ export function penaltyShootout(match) {
   }
 }
 
+// Parse one scorer entry, e.g. "F. Balogun 45'+5'", "D. Bobadilla 7'(OG)",
+// "L. Messi 90'+8'(P)" → { name, minute, own, pen }. `minute` keeps stoppage
+// time ("45+5") and drops the apostrophes; the UI re-adds a single trailing '.
+function parseScorerEntry(raw) {
+  let s = String(raw).trim()
+  if (!s) return null
+  const own = /\(o\.?g\.?\)/i.test(s)
+  const pen = /\(pen\.?\)|\(p\)/i.test(s)
+  s = s.replace(/\((?:o\.?g\.?|pen\.?|p)\)/ig, '').trim()
+  // Trailing minute: "9'", "45'+5'", "90'+8'".
+  const m = s.match(/\s+(\d+'?(?:\s*\+\s*\d+'?)?)\s*$/)
+  let minute = null
+  let name = s
+  if (m) {
+    minute = m[1].replace(/'/g, '').replace(/\s+/g, '')
+    name = s.slice(0, m.index).trim()
+  }
+  return { name: name || s, minute, own, pen }
+}
+
+// Parse a scorers array string into [{ name, minute, own, pen }]. Upstream uses
+// a Postgres-array string but with inconsistent quote characters (straight " or
+// typographic “ ”); "null"/"" mean no goals. Reuses parsePgArray after folding
+// smart quotes to straight ones.
+function parseScorers(raw) {
+  if (typeof raw !== 'string') return []
+  const norm = raw.replace(/[“”]/g, '"')
+  return parsePgArray(norm).map(parseScorerEntry).filter(Boolean)
+}
+
+// Goal scorers for a match, or null if none recorded. Lists grow across polls,
+// so a live match fills in as goals are scored.
+export function goalScorers(match) {
+  if (!match) return null
+  const home = parseScorers(match.home_scorers)
+  const away = parseScorers(match.away_scorers)
+  if (!home.length && !away.length) return null
+  return { home, away }
+}
+
 // Descriptor for the card status bar: { label, state }.
 //   state ∈ 'upcoming' | 'live' | 'ft'  — drives styling.
 //   label is null when upcoming (the caller shows the kickoff date/time),
