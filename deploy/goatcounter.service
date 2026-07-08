@@ -1,0 +1,25 @@
+[Unit]
+Description=goatcounter - self-hosted analytics for bracket.cherryslabs.com
+Documentation=https://www.goatcounter.com/help/self-host
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=el
+# Private: only the Express server (localhost) talks to it; the browser reaches
+# it same-origin via bracket.cherryslabs.com/stats (Express proxies /stats -> here).
+ExecStart=/home/el/.local/bin/goatcounter serve \
+  -db "sqlite+/home/el/.local/share/goatcounter/db.sqlite3" \
+  -listen 127.0.0.1:8085 \
+  -base-path /stats \
+  -tls http \
+  -public-port 443 \
+  -automigrate
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
