@@ -2,9 +2,11 @@ import { useState } from 'react'
 import Bracket from './Bracket'
 import Shootout from './Shootout'
 import GoalScorers from './GoalScorers'
+import { useConfig } from '../hooks/useConfig'
 import './LiveFocusView.css'
 
 export default function LiveFocusView({ allMatches, liveMatches }) {
+  const { capabilities } = useConfig()
   const [currentIdx, setCurrentIdx] = useState(0)
   const count = liveMatches.length
   const live = liveMatches[Math.min(currentIdx, count - 1)]
@@ -48,8 +50,8 @@ export default function LiveFocusView({ allMatches, liveMatches }) {
           </div>
         </div>
 
-        <GoalScorers match={live} size="hero" />
-        <Shootout match={live} size="lg" />
+        {capabilities?.scorers && <GoalScorers match={live} size="hero" />}
+        {capabilities?.shootout && <Shootout match={live} size="lg" />}
       </div>
 
       {/* ── Full bracket below ───────────────── */}

@@ -1,17 +1,22 @@
 import { useEffect, useMemo } from 'react'
+import { useParams } from 'react-router-dom'
 import { useMatches } from './hooks/useMatches'
 import { TimezoneProvider } from './hooks/useTimezone'
+import { ConfigProvider } from './hooks/useConfig'
 import { isFinished, isInProgress, isDecided } from './matchStatus'
 import Bracket from './components/Bracket'
 import LiveFocusView from './components/LiveFocusView'
 import UpcomingFocusView from './components/UpcomingFocusView'
 import GroupResults from './components/GroupResults'
 import TimezoneSelect from './components/TimezoneSelect'
+import SportSelect from './components/SportSelect'
+import LiveBanner from './components/LiveBanner'
 import Footer from './components/Footer'
 import './App.css'
 
 export default function App() {
-  const { allMatches, knockoutMatches, liveMatches, groups, config, loading, error } = useMatches()
+  const { sport } = useParams()
+  const { allMatches, knockoutMatches, liveMatches, groups, config, loading, error } = useMatches(sport)
   const groupMatches = allMatches.filter(m => m.round === 'group')
 
   // The next kicked-off-but-unstarted match(es) with real (non-TBD) teams —
@@ -42,37 +47,41 @@ export default function App() {
   }
 
   return (
-    <TimezoneProvider>
-      <div className="app">
-        <header className="site-header">
-          {config.sport && <div className="header-eyebrow">{config.sport.toUpperCase()}</div>}
-          <h1 className="header-title">{config.name}</h1>
-          {config.subtitle && <div className="header-sub">{config.subtitle}</div>}
-          <TimezoneSelect />
-        </header>
+    <ConfigProvider config={config}>
+      <TimezoneProvider>
+        <div className="app">
+          <LiveBanner current={sport} />
+          <header className="site-header">
+            <SportSelect current={sport} />
+            {config.sport && <div className="header-eyebrow">{config.sport.toUpperCase()}</div>}
+            <h1 className="header-title">{config.name}</h1>
+            {config.subtitle && <div className="header-sub">{config.subtitle}</div>}
+            <TimezoneSelect />
+          </header>
 
-        {error && <div className="error-banner">API error: {error}</div>}
+          {error && <div className="error-banner">API error: {error}</div>}
 
-        <div className="bracket-section">
-          {liveMatches.length > 0 ? (
-            <LiveFocusView
-              allMatches={knockoutMatches}
-              liveMatches={liveMatches}
-            />
-          ) : nextMatches.length > 0 ? (
-            <UpcomingFocusView
-              allMatches={knockoutMatches}
-              nextMatches={nextMatches}
-            />
-          ) : (
-            <Bracket allMatches={knockoutMatches} />
-          )}
+          <div className="bracket-section">
+            {liveMatches.length > 0 ? (
+              <LiveFocusView
+                allMatches={knockoutMatches}
+                liveMatches={liveMatches}
+              />
+            ) : nextMatches.length > 0 ? (
+              <UpcomingFocusView
+                allMatches={knockoutMatches}
+                nextMatches={nextMatches}
+              />
+            ) : (
+              <Bracket allMatches={knockoutMatches} />
+            )}
+          </div>
+
+          {config.hasGroups && <GroupResults groups={groups} matches={groupMatches} />}
+
+          <Footer />
         </div>
-
-        {config.hasGroups && <GroupResults groups={groups} matches={groupMatches} />}
-
-        <Footer />
-      </div>
-    </TimezoneProvider>
+      </TimezoneProvider>
+    </ConfigProvider>
   )
 }

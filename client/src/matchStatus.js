@@ -46,6 +46,9 @@ function penScore(raw) {
 // are broken on the penalty shootout when the 90'/ET score is level.
 export function matchWinner(match) {
   if (!match || !isFinished(match)) return null
+  // An adapter may state the winner explicitly (e.g. tennis, where a retirement
+  // can leave the set count level). Trust it over score-derived logic.
+  if (match.winner === 'home' || match.winner === 'away') return match.winner
   const h = match.homeScore
   const a = match.awayScore
   if (h == null || a == null) return null

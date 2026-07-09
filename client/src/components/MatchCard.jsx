@@ -1,6 +1,7 @@
 import { forwardRef, useState } from 'react'
 import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout, goalScorers } from '../matchStatus'
 import { useTimezone } from '../hooks/useTimezone'
+import { useConfig } from '../hooks/useConfig'
 import { formatKickoff } from '../timeFormat'
 import Shootout from './Shootout'
 import GoalScorers from './GoalScorers'
@@ -8,6 +9,7 @@ import './MatchCard.css'
 
 const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight, big }, ref) {
   const { timezone } = useTimezone()
+  const { capabilities, finishedLabel } = useConfig()
   const [expanded, setExpanded] = useState(false)
 
   if (!match) {
@@ -18,9 +20,13 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const live = isInProgress(match)
   const showScore = live || done
   const winner = matchWinner(match)
-  const shootout = penaltyShootout(match)
+  // Football-only detail panels are gated on the sport's capabilities (they also
+  // self-suppress when their data is absent, so this is belt-and-braces).
+  const shootout = capabilities?.shootout ? penaltyShootout(match) : null
+  const goals = capabilities?.scorers ? goalScorers(match) : null
   const status = matchStatus(match)
-  const goals = goalScorers(match)
+  // Neutralise the finished label per sport ('Full time' → 'Final' for tennis).
+  const statusLabel = status.state === 'ft' ? (finishedLabel ?? status.label) : status.label
 
   // The focus (big) cards show scorers inline. Every other finished/live card
   // that has scorers becomes tap-to-expand so the compact bracket stays clean.
@@ -32,6 +38,8 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const awayName = match.awayTeam?.name ?? 'TBD'
   const homeFlag = match.homeTeam?.flag ?? null
   const awayFlag = match.awayTeam?.flag ?? null
+  const homeSeed = match.homeSeed ?? null
+  const awaySeed = match.awaySeed ?? null
   const homeScore = match.homeScore
   const awayScore = match.awayScore
   const dateStr   = formatKickoff(match.date, timezone)
@@ -56,12 +64,14 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
           the card's bottom edge (see MatchCard.css). */}
       <div className="card-body">
         <div className={`team-row${winner === 'home' ? ' winner' : ''}`}>
+          {homeSeed && <span className="seed" title={`Seed ${homeSeed}`}>{homeSeed}</span>}
           {homeFlag && <img src={homeFlag} alt="" className="flag" />}
           <span className="team-name">{homeName}</span>
           {winner === 'home' && <span className="trophy" title="Winner">🏆</span>}
           {showScore && <span className="score">{homeScore ?? 0}</span>}
         </div>
         <div className={`team-row${winner === 'away' ? ' winner' : ''}`}>
+          {awaySeed && <span className="seed" title={`Seed ${awaySeed}`}>{awaySeed}</span>}
           {awayFlag && <img src={awayFlag} alt="" className="flag" />}
           <span className="team-name">{awayName}</span>
           {winner === 'away' && <span className="trophy" title="Winner">🏆</span>}
@@ -78,10 +88,10 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
       <div className={`card-status status-${status.state}`}>
         {shootout ? (
           <Shootout match={match} size="bar" />
-        ) : status.label ? (
+        ) : statusLabel ? (
           <span className="status-line">
             {status.state === 'live' && <span className="status-dot" />}
-            {status.label}
+            {statusLabel}
           </span>
         ) : (
           <div
