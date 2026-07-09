@@ -79,6 +79,9 @@
 
 /* ── Collapsible (finished) rounds ─────────────── */
 .round-head-btn {
+  width: 100%;          /* stretch so justify-content:center actually centres the
+                           label — a shrink-to-fit button was left-aligning it,
+                           clashing with the centred banner and focus title */
   background: none;
   border: none;
   padding: 0;
