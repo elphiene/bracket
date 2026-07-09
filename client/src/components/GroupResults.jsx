@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { isFinished, matchWinner } from '../matchStatus'
 import { useTimezone } from '../hooks/useTimezone'
 import { formatKickoff } from '../timeFormat'
+import GoalScorers from './GoalScorers'
 import './GroupResults.css'
 
 function GroupFixture({ match, timezone }) {
@@ -23,7 +24,11 @@ function GroupFixture({ match, timezone }) {
           {done && <span className="fixture-score">{match.awayScore ?? 0}</span>}
         </div>
       </div>
-      {!done && dateStr && <span className="fixture-date">{dateStr}</span>}
+      {done ? (
+        <GoalScorers match={match} size="list" />
+      ) : (
+        dateStr && <span className="fixture-date">{dateStr}</span>
+      )}
     </div>
   )
 }

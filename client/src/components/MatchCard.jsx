@@ -1,5 +1,5 @@
-import { forwardRef } from 'react'
-import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout } from '../matchStatus'
+import { forwardRef, useState } from 'react'
+import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout, goalScorers } from '../matchStatus'
 import { useTimezone } from '../hooks/useTimezone'
 import { formatKickoff } from '../timeFormat'
 import Shootout from './Shootout'
@@ -8,6 +8,7 @@ import './MatchCard.css'
 
 const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight, big }, ref) {
   const { timezone } = useTimezone()
+  const [expanded, setExpanded] = useState(false)
 
   if (!match) {
     return <div ref={ref} className={`match-card placeholder${big ? ' big' : ''}`}>TBD</div>
@@ -19,6 +20,13 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   const winner = matchWinner(match)
   const shootout = penaltyShootout(match)
   const status = matchStatus(match)
+  const goals = goalScorers(match)
+
+  // The focus (big) cards show scorers inline. Every other finished/live card
+  // that has scorers becomes tap-to-expand so the compact bracket stays clean.
+  const expandable = !big && showScore && !!goals
+  const isOpen = expandable && expanded
+  const toggle = expandable ? () => setExpanded(e => !e) : undefined
 
   const homeName = match.homeTeam?.name ?? 'TBD'
   const awayName = match.awayTeam?.name ?? 'TBD'
@@ -33,8 +41,15 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   return (
     <div
       ref={ref}
-      className={`match-card${big ? ' big' : ''}${live ? ' live' : ''}${done ? ' done' : ''}${highlight ? ' highlight' : ''}`}
+      className={`match-card${big ? ' big' : ''}${live ? ' live' : ''}${done ? ' done' : ''}${highlight ? ' highlight' : ''}${expandable ? ' expandable' : ''}${isOpen ? ' expanded' : ''}`}
       style={accentColor ? { '--accent': accentColor } : {}}
+      onClick={toggle}
+      role={expandable ? 'button' : undefined}
+      tabIndex={expandable ? 0 : undefined}
+      aria-expanded={expandable ? isOpen : undefined}
+      onKeyDown={expandable ? e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(x => !x) }
+      } : undefined}
     >
       <div className={`team-row${winner === 'home' ? ' winner' : ''}`}>
         {homeFlag && <img src={homeFlag} alt="" className="flag" />}
@@ -76,6 +91,15 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
           </div>
         )}
       </div>
+
+      {/* Tap-to-expand goal scorers for compact (non-focus) past/live cards. */}
+      {expandable && (
+        <div className="goal-toggle">
+          <span>{isOpen ? 'Hide goals' : 'Goals'}</span>
+          <span className="goal-toggle-chev">{isOpen ? '▴' : '▾'}</span>
+        </div>
+      )}
+      {isOpen && <GoalScorers match={match} size="list" />}
     </div>
   )
 })
