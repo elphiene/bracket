@@ -51,22 +51,27 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(x => !x) }
       } : undefined}
     >
-      <div className={`team-row${winner === 'home' ? ' winner' : ''}`}>
-        {homeFlag && <img src={homeFlag} alt="" className="flag" />}
-        <span className="team-name">{homeName}</span>
-        {winner === 'home' && <span className="trophy" title="Winner">🏆</span>}
-        {showScore && <span className="score">{homeScore ?? 0}</span>}
-      </div>
-      <div className={`team-row${winner === 'away' ? ' winner' : ''}`}>
-        {awayFlag && <img src={awayFlag} alt="" className="flag" />}
-        <span className="team-name">{awayName}</span>
-        {winner === 'away' && <span className="trophy" title="Winner">🏆</span>}
-        {showScore && <span className="score">{awayScore ?? 0}</span>}
-      </div>
+      {/* Teams (+ focus-round scorers) centre in the space above the status
+          bar; the card-body flexes to fill so the status bar stays pinned to
+          the card's bottom edge (see MatchCard.css). */}
+      <div className="card-body">
+        <div className={`team-row${winner === 'home' ? ' winner' : ''}`}>
+          {homeFlag && <img src={homeFlag} alt="" className="flag" />}
+          <span className="team-name">{homeName}</span>
+          {winner === 'home' && <span className="trophy" title="Winner">🏆</span>}
+          {showScore && <span className="score">{homeScore ?? 0}</span>}
+        </div>
+        <div className={`team-row${winner === 'away' ? ' winner' : ''}`}>
+          {awayFlag && <img src={awayFlag} alt="" className="flag" />}
+          <span className="team-name">{awayName}</span>
+          {winner === 'away' && <span className="trophy" title="Winner">🏆</span>}
+          {showScore && <span className="score">{awayScore ?? 0}</span>}
+        </div>
 
-      {/* Focus round only: goal scorers fill the taller card and add detail.
-          Renders nothing when the feed has no scorers. */}
-      {big && showScore && <GoalScorers match={match} size="card" />}
+        {/* Focus round only: goal scorers fill the taller card and add detail.
+            Renders nothing when the feed has no scorers. */}
+        {big && showScore && <GoalScorers match={match} size="card" />}
+      </div>
 
       {/* Fixed-height status bar. Penalties render here too, so shootout
           cards stay the same height as every other card. */}
