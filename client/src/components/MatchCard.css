@@ -44,7 +44,17 @@
    between the two team rows. */
 .round-current .round-cards > .match-card {
   container-type: inline-size;
-  min-height: clamp(104px, 24vh, 240px);
+  min-height: clamp(84px, 13vh, 140px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Teams (+ scorers) fill the space above the status bar and centre within it,
+   so the status bar sits flush at the card's bottom instead of floating with
+   empty card beneath it. */
+.round-current .round-cards .card-body {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
