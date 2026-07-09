@@ -124,6 +124,29 @@
   background: #1a2432;
 }
 
+/* ── Tap-to-expand goal scorers (compact finished/live cards) ──────── */
+.match-card.expandable { cursor: pointer; }
+.match-card.expandable:hover { border-left-color: var(--accent, #3d5372); }
+.match-card.expandable:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: 1px;
+}
+.goal-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 8px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #566779;
+  background: #1a2432;
+}
+.match-card.expandable:hover .goal-toggle { color: #8b949e; }
+.goal-toggle-chev { font-size: 8px; }
+
 .status-line {
   display: inline-flex;
   align-items: center;

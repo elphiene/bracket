@@ -23,12 +23,19 @@
 
 .gs-goal {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 4px;
   max-width: 100%;
   color: #8b949e;
 }
 .gs-win .gs-goal { color: #e6edf3; }
+
+.gs-flag {
+  width: 1.15em;
+  height: auto;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
 
 .gs-name {
   overflow: hidden;
@@ -44,10 +51,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* away side lists the minute before the name so both columns read outward
-   from the ball; fl: reverse the flex order for away. */
-.gs-away .gs-goal { flex-direction: row-reverse; }
-
 .gs-tag {
   flex-shrink: 0;
   font-size: 0.8em;
@@ -56,12 +59,32 @@
   color: #566779;
 }
 
+/* Scoreboard variants: mirror the away side so both teams' names flank the
+   central ball (home name on the right of its column, away name on the left). */
+.goal-scorers.card .gs-away .gs-goal,
+.goal-scorers.hero .gs-away .gs-goal { flex-direction: row-reverse; }
+
 /* ── Card variant (focus round; card is a query container) ────────── */
 .goal-scorers.card {
   padding: clamp(4px, 2.4cqw, 12px) clamp(8px, 3cqw, 18px) 0;
   font-size: clamp(9px, 3.3cqw, 15px);
 }
 .goal-scorers.card .gs-ball { font-size: clamp(10px, 3.6cqw, 16px); }
+
+/* ── List variant (compact: group fixtures, expanded knockout cards) ── */
+/* One full-width column (fixed px, no container units) with a flag per goal so
+   names have room and the scoring side is unambiguous. */
+.goal-scorers.list {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+  padding: 5px 9px 2px;
+  font-size: 11px;
+}
+.goal-scorers.list .gs-ball { display: none; }
+.goal-scorers.list .gs-side { align-items: stretch; gap: 1px; }
+.goal-scorers.list .gs-goal { justify-content: flex-start; width: 100%; }
+.goal-scorers.list .gs-name { flex: 1; }
 
 /* ── Hero variant (live-focus scoreboard) ─────────────────────────── */
 .goal-scorers.hero {
