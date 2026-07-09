@@ -1,0 +1,78 @@
+.live-banner {
+  flex-shrink: 0;
+  overflow: hidden;
+  width: 100%;
+  background: #10161d;
+  border-bottom: 1px solid #21262d;
+  white-space: nowrap;
+}
+
+/* Duplicated track scrolls left; -50% = one full copy, so it loops seamlessly. */
+.live-banner-track {
+  display: inline-flex;
+  align-items: center;
+  will-change: transform;
+  animation: live-banner-scroll 32s linear infinite;
+}
+.live-banner:hover .live-banner-track,
+.live-banner:focus-within .live-banner-track {
+  animation-play-state: paused;
+}
+@keyframes live-banner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.live-banner-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  color: #8b949e;
+  white-space: nowrap;
+}
+.live-banner-item:hover .live-banner-sport,
+.live-banner-item:focus-visible .live-banner-sport {
+  color: #e6edf3;
+  text-decoration: underline;
+}
+
+.live-banner-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot, #f7b731);
+  flex-shrink: 0;
+  animation: live-banner-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-banner-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+.live-banner-tag {
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #f0506e;
+}
+.live-banner-sport {
+  font-weight: 700;
+  color: #c9d1d9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.live-banner-sep { color: #484f58; }
+.live-banner-teams { color: #adbac7; }
+.live-banner-score { font-weight: 700; color: #e6edf3; }
+
+/* Accessibility: no auto-scroll for reduced-motion users — let them scroll it. */
+@media (prefers-reduced-motion: reduce) {
+  .live-banner { overflow-x: auto; }
+  .live-banner-track { animation: none; }
+  .live-banner-dot { animation: none; }
+}

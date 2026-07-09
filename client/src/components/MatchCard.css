@@ -251,6 +251,23 @@
   flex-shrink: 0;
 }
 
+/* Seed/rank badge (NCAA, NFL). Absent for sports without seeds. */
+.seed {
+  flex-shrink: 0;
+  min-width: 15px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #8b949e;
+  background: rgba(139, 148, 158, 0.14);
+  border-radius: 3px;
+  padding: 1px 3px;
+}
+.match-card.big .seed {
+  font-size: 12px;
+  min-width: 18px;
+}
+
 .team-name {
   font-size: 13px;
   font-weight: 600;

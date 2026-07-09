@@ -12,9 +12,14 @@ const DEFAULT_CONFIG = {
   accentColor: '#f7b731',
   hasGroups: false,
   hasThirdPlace: false,
+  scoreNoun: 'points',
+  finishedLabel: 'Final',
+  capabilities: { shootout: false, scorers: false },
 }
 
-export function useMatches() {
+// Loads and polls one sport's data. Re-initialises whenever `sport` changes
+// (config is fetched once per sport, matches/groups poll on a live-aware TTL).
+export function useMatches(sport) {
   const [allMatches, setAllMatches] = useState([])
   const [groups, setGroups] = useState([])
   const [config, setConfig] = useState(DEFAULT_CONFIG)
@@ -26,38 +31,45 @@ export function useMatches() {
   const liveMatches = allMatches.filter(isInProgress)
 
   useEffect(() => {
+    if (!sport) return
     let timer
+    let cancelled = false
 
     async function poll() {
       try {
-        const [matches, grps] = await Promise.all([fetchMatches(), fetchGroups()])
+        const [matches, grps] = await Promise.all([fetchMatches(sport), fetchGroups(sport)])
+        if (cancelled) return
         matchesRef.current = matches
         setAllMatches(matches)
         setGroups(grps)
         setError(null)
       } catch (e) {
-        setError(e.message)
+        if (!cancelled) setError(e.message)
       }
+      if (cancelled) return
       const isLive = matchesRef.current.some(isInProgress)
       timer = setTimeout(poll, isLive ? TTL_LIVE : TTL_IDLE)
     }
 
     async function init() {
+      setLoading(true)
       try {
         const [cfg, matches, grps] = await Promise.all([
-          fetchConfig(),
-          fetchMatches(),
-          fetchGroups(),
+          fetchConfig(sport),
+          fetchMatches(sport),
+          fetchGroups(sport),
         ])
+        if (cancelled) return
         matchesRef.current = matches
         setConfig(cfg)
         setAllMatches(matches)
         setGroups(grps)
       } catch (e) {
-        setError(e.message)
+        if (!cancelled) setError(e.message)
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
+      if (cancelled) return
       const isLive = matchesRef.current.some(isInProgress)
       timer = setTimeout(poll, isLive ? TTL_LIVE : TTL_IDLE)
     }
@@ -68,11 +80,11 @@ export function useMatches() {
     if (import.meta.env.DEV) {
       const handler = () => { clearTimeout(timer); poll() }
       window.addEventListener('bracket:poll', handler)
-      return () => { clearTimeout(timer); window.removeEventListener('bracket:poll', handler) }
+      return () => { cancelled = true; clearTimeout(timer); window.removeEventListener('bracket:poll', handler) }
     }
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [sport])
 
   return { allMatches, knockoutMatches, liveMatches, groups, config, loading, error }
 }
