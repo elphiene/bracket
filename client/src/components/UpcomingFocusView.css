@@ -32,3 +32,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Stacked on mobile (see LiveFocusView.css): the date/venue block spans the
+   full width between the two teams, so it no longer needs to be clamped to
+   40vw — let the venue line breathe and wrap instead of ellipsising. */
+@media (max-width: 520px) {
+  .hero-when-where {
+    width: 100%;
+  }
+
+  .hero-when {
+    font-size: 22px;
+  }
+
+  .hero-where {
+    max-width: 90vw;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}

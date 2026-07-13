@@ -112,6 +112,53 @@
   color: #2d3d52;
 }
 
+/* ── Mobile: stack the matchup vertically ─────────────────────── */
+/* The horizontal team | score | team row squeezes each name into a third of
+   the width, so long names (players, countries) get ellipsised to a few
+   letters ("NOVAK DJ…", "FRAN…"). On phones we stack the three pieces so each
+   spans the full width: team (flag + name) on its own line, the scoreboard
+   between the two teams, and the second team below it. Names then have room to
+   show in full. */
+@media (max-width: 520px) {
+  .hero-matchup {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-team,
+  .hero-team-right {
+    flex: none;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.15;
+  }
+
+  .hero-flag {
+    width: 34px;
+  }
+
+  .hero-scoreboard {
+    gap: 18px;
+  }
+
+  .hero-score {
+    font-size: 46px;
+    min-width: 36px;
+  }
+
+  .hero-sep {
+    font-size: 28px;
+  }
+}
+
 /* ── Animations ───────────────────────────────── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
