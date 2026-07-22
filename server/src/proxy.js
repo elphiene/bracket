@@ -55,8 +55,36 @@ export function getTeams(req, res) {
 }
 
 // ── Cross-sport endpoints ────────────────────────────────────────────────────
-export function getSports(_req, res) {
-  res.json(listSports())
+
+// Light per-edition summary for the hub landing: overall state + the raw bits the
+// client needs to compose a blurb. `champion` is left for the client to redact
+// under spoiler-free mode (the server can't know that per-user preference).
+function summarise(matches) {
+  const live = matches.filter(m => m.status === 'live')
+  if (live.length) {
+    return { status: 'live', liveCount: live.length, round: live[0].roundLabel ?? null, champion: null, startDate: null }
+  }
+  const scheduled = matches.filter(m => m.status === 'scheduled' && m.date)
+  if (scheduled.length) {
+    const next = scheduled.reduce((a, b) => (a.date < b.date ? a : b))
+    return { status: 'upcoming', liveCount: 0, round: next.roundLabel ?? null, champion: null, startDate: next.date }
+  }
+  const final = matches.find(m => m.round === 'final')
+  let champion = null
+  if (final?.winner) champion = (final.winner === 'home' ? final.homeTeam : final.awayTeam)?.name ?? null
+  return { status: 'finished', liveCount: 0, round: final?.roundLabel ?? null, champion, startDate: null }
+}
+
+export async function getSports(_req, res) {
+  const out = await Promise.all(listSports().map(async s => {
+    try {
+      const matches = await getCached(s.slug, 'matches', () => getSport(s.slug).adapter.getMatches(), { liveAware: true })
+      return { ...s, ...summarise(matches) }
+    } catch {
+      return { ...s, status: null, liveCount: 0, round: null, champion: null, startDate: null }
+    }
+  }))
+  res.json(out)
 }
 
 // Which sport to show on the root landing: the first with a live match, else the

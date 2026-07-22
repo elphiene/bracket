@@ -1,7 +1,8 @@
 import { forwardRef, useState } from 'react'
-import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout, goalScorers } from '../matchStatus'
+import { isFinished, isInProgress, matchStatus, matchWinner, penaltyShootout, goalScorers, shouldHideResult } from '../matchStatus'
 import { useTimezone } from '../hooks/useTimezone'
 import { useConfig } from '../hooks/useConfig'
+import { useSpoiler } from '../hooks/useSpoiler'
 import { formatKickoff } from '../timeFormat'
 import Shootout from './Shootout'
 import GoalScorers from './GoalScorers'
@@ -10,6 +11,7 @@ import './MatchCard.css'
 const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight, big }, ref) {
   const { timezone } = useTimezone()
   const { capabilities, finishedLabel } = useConfig()
+  const { spoilerFree } = useSpoiler()
   const [expanded, setExpanded] = useState(false)
 
   if (!match) {
@@ -18,15 +20,18 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
 
   const done = isFinished(match)
   const live = isInProgress(match)
-  const showScore = live || done
-  const winner = matchWinner(match)
+  // Spoiler-free: a live/finished match is rendered like a fixture — no score,
+  // badge, winner, or scorers, but who's playing and when still show.
+  const hideResult = shouldHideResult(match, spoilerFree)
+  const showScore = (live || done) && !hideResult
+  const winner = hideResult ? null : matchWinner(match)
   // Football-only detail panels are gated on the sport's capabilities (they also
   // self-suppress when their data is absent, so this is belt-and-braces).
-  const shootout = capabilities?.shootout ? penaltyShootout(match) : null
-  const goals = capabilities?.scorers ? goalScorers(match) : null
+  const shootout = !hideResult && capabilities?.shootout ? penaltyShootout(match) : null
+  const goals = !hideResult && capabilities?.scorers ? goalScorers(match) : null
   const status = matchStatus(match)
   // Neutralise the finished label per sport ('Full time' → 'Final' for tennis).
-  const statusLabel = status.state === 'ft' ? (finishedLabel ?? status.label) : status.label
+  const statusLabel = hideResult ? null : (status.state === 'ft' ? (finishedLabel ?? status.label) : status.label)
 
   // The focus (big) cards show scorers inline. Every other finished/live card
   // that has scorers becomes tap-to-expand so the compact bracket stays clean.
@@ -49,7 +54,7 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
   return (
     <div
       ref={ref}
-      className={`match-card${big ? ' big' : ''}${live ? ' live' : ''}${done ? ' done' : ''}${highlight ? ' highlight' : ''}${expandable ? ' expandable' : ''}${isOpen ? ' expanded' : ''}`}
+      className={`match-card${big ? ' big' : ''}${live && !hideResult ? ' live' : ''}${done && !hideResult ? ' done' : ''}${highlight ? ' highlight' : ''}${expandable ? ' expandable' : ''}${isOpen ? ' expanded' : ''}`}
       style={accentColor ? { '--accent': accentColor } : {}}
       onClick={toggle}
       role={expandable ? 'button' : undefined}
@@ -85,9 +90,14 @@ const MatchCard = forwardRef(function MatchCard({ match, accentColor, highlight,
 
       {/* Fixed-height status bar. Penalties render here too, so shootout
           cards stay the same height as every other card. */}
-      <div className={`card-status status-${status.state}`}>
+      <div className={`card-status status-${hideResult ? 'hidden' : status.state}`}>
         {shootout ? (
           <Shootout match={match} size="bar" />
+        ) : hideResult ? (
+          <div className="upcoming-info" title="Spoiler-free mode is on">
+            <span className="upcoming-label">Spoiler-free</span>
+            {dateStr && <span className="upcoming-meta"><span className="upcoming-date">{dateStr}</span></span>}
+          </div>
         ) : statusLabel ? (
           <span className="status-line">
             {status.state === 'live' && <span className="status-dot" />}

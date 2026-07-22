@@ -128,6 +128,68 @@ function normaliseMatch(raw, teamById, stadiumById) {
   }
 }
 
+// ── Bracket advancement ────────────────────────────────────────────────────
+// Upstream never backfills the next round's home/away team once a match
+// finishes — the 3rd-place/final rows stay home_team_id:"0" with a literal
+// "Winner Match 97" / "Loser Match 97" label forever, even after that match is
+// long decided. But the label IS the dependency (which match, and whether we
+// want its winner or its loser), so we resolve it ourselves once the games
+// list is normalised.
+const PLACEHOLDER_RE = /^(Winner|Loser) Match (\d+)$/
+
+function parsePenalty(raw) {
+  if (raw == null || raw === 'null' || raw === '') return null
+  const n = Number(raw)
+  return Number.isNaN(n) ? null : n
+}
+
+// Which side won a finished match: 'home' | 'away' | null (undecided — level
+// with no penalty data yet). Mirrors the client's matchWinner (matchStatus.js)
+// but runs server-side over the normalised shape's score/penalty fields.
+function decidedWinnerSide(match) {
+  if (match.status !== 'finished') return null
+  if (match.homeScore == null || match.awayScore == null) return null
+  if (match.homeScore > match.awayScore) return 'home'
+  if (match.awayScore > match.homeScore) return 'away'
+  const hp = parsePenalty(match.home_penalty_score)
+  const ap = parsePenalty(match.away_penalty_score)
+  if (hp == null || ap == null) return null
+  if (hp > ap) return 'home'
+  if (ap > hp) return 'away'
+  return null
+}
+
+function resolveTeamSlot(name, matchById) {
+  const m = name?.match(PLACEHOLDER_RE)
+  if (!m) return null
+  const [, kind, depId] = m
+  const dep = matchById.get(depId)
+  if (!dep) return null
+  const winnerSide = decidedWinnerSide(dep)
+  if (!winnerSide) return null
+  const side = kind === 'Winner' ? winnerSide : (winnerSide === 'home' ? 'away' : 'home')
+  return side === 'home' ? dep.homeTeam : dep.awayTeam
+}
+
+// Fills in any still-placeholder team slot whose dependency match is now
+// decided. Loops a few times so a chain (e.g. a round itself resolved from an
+// earlier placeholder) settles, though in practice one pass covers it.
+function resolvePlaceholders(matches) {
+  const matchById = new Map(matches.map(m => [m.id, m]))
+  for (let pass = 0; pass < 3; pass++) {
+    let changed = false
+    for (const match of matches) {
+      for (const side of ['homeTeam', 'awayTeam']) {
+        const team = match[side]
+        if (team.id !== '0') continue
+        const resolved = resolveTeamSlot(team.name, matchById)
+        if (resolved) { match[side] = resolved; changed = true }
+      }
+    }
+    if (!changed) break
+  }
+}
+
 // ── Upstream helpers ───────────────────────────────────────────────────────
 async function fetchUpstream(path) {
   const res = await fetch(`${UPSTREAM}${path}`)
@@ -176,7 +238,9 @@ export const adapter = {
     ])
     const teamById = new Map(teams.map(t => [String(t.id), t]))
     const stadiumById = new Map(stadiums.map(s => [String(s.id), s]))
-    return gamesBody.games.map(raw => normaliseMatch(raw, teamById, stadiumById))
+    const matches = gamesBody.games.map(raw => normaliseMatch(raw, teamById, stadiumById))
+    resolvePlaceholders(matches)
+    return matches
   },
 
   async getGroups() {

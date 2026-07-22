@@ -30,6 +30,14 @@ export function isDecided(match) {
   return Boolean(match?.homeTeam?.flag && match?.awayTeam?.flag)
 }
 
+// Whether spoiler-free mode should hide this match's result. Only live or
+// finished matches have a result to hide; a scheduled match shows its fixture
+// as usual. The single gate every spoiler-aware component consults so the rule
+// isn't re-derived per component (see useSpoiler.jsx).
+export function shouldHideResult(match, spoilerFree) {
+  return Boolean(spoilerFree) && (isInProgress(match) || isFinished(match))
+}
+
 function inPenalties(match) {
   const p = match?.home_penalty_score
   return p != null && p !== 'null' && p !== ''

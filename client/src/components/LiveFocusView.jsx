@@ -3,15 +3,22 @@ import Bracket from './Bracket'
 import Shootout from './Shootout'
 import GoalScorers from './GoalScorers'
 import { useConfig } from '../hooks/useConfig'
+import { useSpoiler } from '../hooks/useSpoiler'
+import { shouldHideResult } from '../matchStatus'
 import './LiveFocusView.css'
 
 export default function LiveFocusView({ allMatches, liveMatches }) {
   const { capabilities } = useConfig()
+  const { spoilerFree } = useSpoiler()
   const [currentIdx, setCurrentIdx] = useState(0)
   const count = liveMatches.length
   const live = liveMatches[Math.min(currentIdx, count - 1)]
 
   if (!live) return null
+
+  // Spoiler-free: keep the "LIVE" framing (knowing a match is on isn't a spoiler)
+  // but hold back the score and the goal/shootout detail.
+  const hideResult = shouldHideResult(live, spoilerFree)
 
   const homeName = live.homeTeam?.name ?? 'TBD'
   const awayName = live.awayTeam?.name ?? 'TBD'
@@ -38,11 +45,17 @@ export default function LiveFocusView({ allMatches, liveMatches }) {
             <span className="hero-name">{homeName}</span>
           </div>
 
-          <div className="hero-scoreboard">
-            <span className="hero-score">{live.homeScore ?? 0}</span>
-            <span className="hero-sep">–</span>
-            <span className="hero-score">{live.awayScore ?? 0}</span>
-          </div>
+          {hideResult ? (
+            <div className="hero-scoreboard hero-hidden">
+              <span className="hero-hidden-note">Score hidden</span>
+            </div>
+          ) : (
+            <div className="hero-scoreboard">
+              <span className="hero-score">{live.homeScore ?? 0}</span>
+              <span className="hero-sep">–</span>
+              <span className="hero-score">{live.awayScore ?? 0}</span>
+            </div>
+          )}
 
           <div className="hero-team hero-team-right">
             <span className="hero-name">{awayName}</span>
@@ -50,8 +63,8 @@ export default function LiveFocusView({ allMatches, liveMatches }) {
           </div>
         </div>
 
-        {capabilities?.scorers && <GoalScorers match={live} size="hero" />}
-        {capabilities?.shootout && <Shootout match={live} size="lg" />}
+        {!hideResult && capabilities?.scorers && <GoalScorers match={live} size="hero" />}
+        {!hideResult && capabilities?.shootout && <Shootout match={live} size="lg" />}
       </div>
 
       {/* ── Full bracket below ───────────────── */}

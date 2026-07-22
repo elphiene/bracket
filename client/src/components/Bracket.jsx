@@ -1,6 +1,7 @@
 import { useCallback, useRef, useEffect, useMemo, useState } from 'react'
 import MatchCard from './MatchCard'
-import { isInProgress } from '../matchStatus'
+import FocusHero from './FocusHero'
+import { isInProgress, isDecided } from '../matchStatus'
 import './Bracket.css'
 
 // Which round should be in focus: the live round, else the earliest
@@ -15,7 +16,7 @@ function currentRoundKey(rounds) {
   return rounds[rounds.length - 1]?.key
 }
 
-export default function Bracket({ allMatches, onLiveRef, highlightId }) {
+export default function Bracket({ allMatches, onLiveRef, highlightId, focusHero = false }) {
   // Derive rounds from match data — works for any sport/tournament structure.
   const rounds = useMemo(() => {
     const map = new Map()
@@ -79,6 +80,13 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
         const isOpen = toggled.has(key) ? !isFocus : isFocus
         const HeadTag = collapsible ? 'button' : 'div'
 
+        // A lone decided focus match (typically the Final) renders as a hero
+        // scoreboard that fills the space, instead of a small card in a void.
+        // Falls back to the card grid for TBD/undecided finals.
+        const soleMatch = mainMatches.length === 1 && !thirdMatch ? mainMatches[0] : null
+        const useHero = isFocus && focusHero && soleMatch && isDecided(soleMatch)
+        const focusCount = mainMatches.length + (thirdMatch ? 1 : 0)
+
         return (
           <section
             key={key}
@@ -96,8 +104,13 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
               {collapsible && <span className="round-chevron">{isOpen ? '▲' : '▼'}</span>}
             </HeadTag>
 
-            {isOpen && (
-              <div className="round-cards">
+            {isOpen && (useHero ? (
+              <FocusHero match={soleMatch} label={label} />
+            ) : (
+              <div
+                className="round-cards"
+                style={isFocus ? { '--focus-count': focusCount } : undefined}
+              >
                 {mainMatches.map(match => (
                   <MatchCard
                     key={match.id}
@@ -115,7 +128,7 @@ export default function Bracket({ allMatches, onLiveRef, highlightId }) {
                   </div>
                 )}
               </div>
-            )}
+            ))}
           </section>
         )
       })}

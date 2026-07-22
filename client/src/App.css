@@ -15,6 +15,18 @@
   padding: 10px clamp(12px, 3vw, 24px) 8px;
 }
 
+/* Right-side header controls (spoiler toggle + timezone), pinned opposite the
+   SportSelect so they bookend the centred title. */
+.header-controls {
+  position: absolute;
+  right: clamp(10px, 3vw, 20px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .header-eyebrow {
   font-size: 10px;
   font-weight: 700;
@@ -46,11 +58,18 @@
   .header-sub {
     display: none;
   }
-  /* Drop the timezone select into its own centered row instead of
+  /* Drop the header controls into their own centered row instead of
      floating over the title — there isn't room for both side by side. */
   .site-header {
     flex-wrap: wrap;
     row-gap: 4px;
+  }
+  .header-controls {
+    position: static;
+    transform: none;
+    flex-basis: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 

@@ -4,7 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Brackets</title>
+    <meta name="theme-color" content="#080d14" />
+    <!-- HEAD-META: the Express server replaces this block with per-route title/description/OG
+         tags in production (see server/src/meta.js). The static defaults below are the
+         dev/fallback and describe the hub. -->
+    <title>Live Brackets — live knockout brackets in one place</title>
+    <meta name="description" content="Follow every knockout tournament's bracket live — World Cup, Wimbledon, the Australian Open, AFL finals and more. No sign-in, no clutter." />
+    <link rel="canonical" href="https://bracket.cherryslabs.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Live Brackets" />
+    <meta property="og:title" content="Live Brackets — live knockout brackets in one place" />
+    <meta property="og:description" content="Follow every knockout tournament's bracket live — World Cup, Wimbledon, the Australian Open, AFL finals and more." />
+    <meta property="og:url" content="https://bracket.cherryslabs.com/" />
+    <meta property="og:image" content="https://bracket.cherryslabs.com/og-default.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Live Brackets — live knockout brackets in one place" />
+    <meta name="twitter:description" content="Follow every knockout tournament's bracket live — no sign-in, no clutter." />
+    <meta name="twitter:image" content="https://bracket.cherryslabs.com/og-default.png" />
+    <!-- /HEAD-META -->
     <!-- Self-hosted GoatCounter analytics, proxied same-origin via the Express /stats route. -->
     <script data-goatcounter="/stats/count" async src="/stats/count.js"></script>
   </head>

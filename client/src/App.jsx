@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMatches } from './hooks/useMatches'
-import { TimezoneProvider } from './hooks/useTimezone'
 import { ConfigProvider } from './hooks/useConfig'
 import { isFinished, isInProgress, isDecided } from './matchStatus'
 import Bracket from './components/Bracket'
@@ -9,6 +8,7 @@ import LiveFocusView from './components/LiveFocusView'
 import UpcomingFocusView from './components/UpcomingFocusView'
 import GroupResults from './components/GroupResults'
 import TimezoneSelect from './components/TimezoneSelect'
+import SpoilerToggle from './components/SpoilerToggle'
 import SportSelect from './components/SportSelect'
 import LiveBanner from './components/LiveBanner'
 import Footer from './components/Footer'
@@ -37,6 +37,13 @@ export default function App() {
     }
   }, [config?.accentColor])
 
+  // Remember the last-viewed sport so the hub can offer a quick way back.
+  useEffect(() => {
+    if (sport) {
+      try { localStorage.setItem('bracket:lastSport', sport) } catch { /* ignore */ }
+    }
+  }, [sport])
+
   if (loading) {
     return (
       <div className="app">
@@ -48,7 +55,6 @@ export default function App() {
 
   return (
     <ConfigProvider config={config}>
-      <TimezoneProvider>
         <div className="app">
           <LiveBanner current={sport} />
           <header className="site-header">
@@ -56,7 +62,10 @@ export default function App() {
             {config.sport && <div className="header-eyebrow">{config.sport.toUpperCase()}</div>}
             <h1 className="header-title">{config.name}</h1>
             {config.subtitle && <div className="header-sub">{config.subtitle}</div>}
-            <TimezoneSelect />
+            <div className="header-controls">
+              <SpoilerToggle />
+              <TimezoneSelect />
+            </div>
           </header>
 
           {error && <div className="error-banner">API error: {error}</div>}
@@ -73,7 +82,7 @@ export default function App() {
                 nextMatches={nextMatches}
               />
             ) : (
-              <Bracket allMatches={knockoutMatches} />
+              <Bracket allMatches={knockoutMatches} focusHero />
             )}
           </div>
 
@@ -81,7 +90,6 @@ export default function App() {
 
           <Footer />
         </div>
-      </TimezoneProvider>
     </ConfigProvider>
   )
 }

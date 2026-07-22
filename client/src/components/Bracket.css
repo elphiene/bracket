@@ -152,11 +152,22 @@
   align-content: center;
   align-items: stretch;
   gap: clamp(14px, 1.8vw, 34px);
+  /* How many cards share one row, capped at 4 so a many-match focus round
+     still wraps to a 4-up grid (--focus-count is set inline in Bracket.jsx). */
+  --per-row: min(var(--focus-count, 1), 4);
 }
 
+/* Card width scales with how many cards the round has: fewer cards → bigger
+   cards (a lone card fills the row up to 560px), so a sparse focus round no
+   longer strands a tiny card in a void. Four quarter-finals still land at
+   ~300px each — one row on a 1080p display, the invariant this cap protects. */
 .round-current .round-cards > .match-card,
 .round-current .round-cards > .third-wrap {
-  width: clamp(240px, 22vw, 440px);
+  width: clamp(
+    260px,
+    calc((100% - (var(--per-row) - 1) * clamp(14px, 1.8vw, 34px)) / var(--per-row)),
+    560px
+  );
   height: auto;
 }
 

@@ -3,16 +3,25 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
-import LiveLanding from './components/LiveLanding.jsx'
+import Hub from './components/Hub.jsx'
+import { TimezoneProvider } from './hooks/useTimezone'
+import { SpoilerProvider } from './hooks/useSpoiler'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        {/* Root auto-routes to whichever sport is live (else the default). */}
-        <Route path="/" element={<LiveLanding />} />
-        <Route path="/:sport" element={<App />} />
-      </Routes>
+      {/* Global remembered preferences wrap both routes so the hub and a sport
+          page share one timezone + spoiler-free choice. Per-sport config stays
+          inside App (ConfigProvider). */}
+      <TimezoneProvider>
+        <SpoilerProvider>
+          <Routes>
+            {/* Root is the hub landing (a real page, not a redirect). */}
+            <Route path="/" element={<Hub />} />
+            <Route path="/:sport" element={<App />} />
+          </Routes>
+        </SpoilerProvider>
+      </TimezoneProvider>
     </BrowserRouter>
   </StrictMode>,
 )

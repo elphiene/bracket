@@ -44,7 +44,9 @@
    between the two team rows. */
 .round-current .round-cards > .match-card {
   container-type: inline-size;
-  min-height: clamp(84px, 13vh, 140px);
+  /* Height scales inversely with the card count (--per-row inherits from
+     .round-cards): a lone fallback card grows tall, four QFs stay compact. */
+  min-height: clamp(96px, calc(46vh / var(--per-row, 1)), 340px);
   display: flex;
   flex-direction: column;
 }
@@ -65,17 +67,17 @@
 }
 
 .round-current .round-cards .flag {
-  width: clamp(22px, 11cqw, 46px);
+  width: clamp(22px, 11cqw, 52px);
   height: auto;
 }
 
 .round-current .round-cards .team-name {
-  font-size: clamp(15px, 7.2cqw, 30px);
+  font-size: clamp(15px, 7.2cqw, 34px);
 }
 
 .round-current .round-cards .score {
-  font-size: clamp(19px, 10.5cqw, 42px);
-  min-width: clamp(20px, 10.5cqw, 40px);
+  font-size: clamp(19px, 10.5cqw, 48px);
+  min-width: clamp(20px, 10.5cqw, 44px);
 }
 
 .round-current .round-cards .trophy {

@@ -112,6 +112,15 @@
   color: #2d3d52;
 }
 
+.hero-hidden-note {
+  font-size: clamp(12px, 2vw, 15px);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #566779;
+  white-space: nowrap;
+}
+
 /* ── Animations ───────────────────────────────── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

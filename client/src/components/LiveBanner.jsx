@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchLiveNow } from '../api'
+import { useSpoiler } from '../hooks/useSpoiler'
 import './LiveBanner.css'
 
 const POLL_MS = 30_000
@@ -12,6 +13,7 @@ const POLL_MS = 30_000
 // what the page's hero already shows.
 export default function LiveBanner({ current }) {
   const navigate = useNavigate()
+  const { spoilerFree } = useSpoiler()
   const [items, setItems] = useState([])
 
   useEffect(() => {
@@ -55,7 +57,9 @@ export default function LiveBanner({ current }) {
             <span className="live-banner-round">{it.roundLabel}</span>
             <span className="live-banner-sep">·</span>
             <span className="live-banner-teams">{it.home} v {it.away}</span>
-            <span className="live-banner-score">{it.homeScore ?? 0}–{it.awayScore ?? 0}</span>
+            {!spoilerFree && (
+              <span className="live-banner-score">{it.homeScore ?? 0}–{it.awayScore ?? 0}</span>
+            )}
           </button>
         ))}
       </div>

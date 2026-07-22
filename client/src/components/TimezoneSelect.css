@@ -1,8 +1,4 @@
 .tz-select {
-  position: absolute;
-  right: clamp(10px, 3vw, 20px);
-  top: 50%;
-  transform: translateY(-50%);
   max-width: 38vw;
   background: transparent;
   border: 1px solid #30363d;
@@ -27,11 +23,7 @@
 
 @media (max-width: 520px) {
   .tz-select {
-    position: static;
-    transform: none;
-    flex-basis: 100%;
-    max-width: 70vw;
-    margin: 0 auto;
+    max-width: 60vw;
     font-size: 10px;
     padding: 3px 5px;
   }
